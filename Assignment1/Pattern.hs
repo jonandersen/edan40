@@ -50,9 +50,11 @@ substituteCheck = substituteTest == testString
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
 
-frenchPresentation = ("My name is *", "Je m'appelle *")
-
-testTransform = transformationApply '*' id "My name is Zacharias" frenchPresentation 
+listTransform = [("Large * ice cream", "Un grande glace a'la *"),("My name is *", "Je m'appelle *")]
+listTransform2 = [("Large * ice cream", "Un grande glace a'la *"),("My name is *", "Je m'appelle *")]
+testTransform = transformationsApply '*' id listTransform "My name is Zacharias"
+testTransform2 = transformationsApply '*' id listTransform "Large vanilla ice cream"
+testTransform3 = transformationsApply '*' id listTransform "Small vanilla ice cream"
 
 -------------------------------------------------------
 -- Applying patterns
@@ -69,5 +71,8 @@ transformationApply wc f xs t
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
+transformationsApply _ _ [] _ = Nothing
+transformationsApply wc f (t:ts) xs 
+  | isJust $ transformationApply wc f xs t  = transformationApply wc f xs t
+  | otherwise = transformationsApply wc f ts xs
+
