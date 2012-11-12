@@ -50,7 +50,9 @@ substituteCheck = substituteTest == testString
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
 
+frenchPresentation = ("My name is *", "Je m'appelle *")
 
+testTransform = transformationApply '*' id "My name is Zacharias" frenchPresentation 
 
 -------------------------------------------------------
 -- Applying patterns
@@ -58,8 +60,8 @@ matchCheck = matchTest == Just testSubstitutions
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
-transformationApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
+transformationApply wc f xs t =  match wc (fst t) xs 
+
 
 
 -- Applying a list of patterns until one succeeds
