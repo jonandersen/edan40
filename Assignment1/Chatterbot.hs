@@ -3,6 +3,7 @@ import Utilities
 import Pattern
 import Random
 import Char
+import Maybe
 
 
 
@@ -39,8 +40,10 @@ rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply _ = id
 
 reflect :: Phrase -> Phrase
-{- TO BE WRITTEN -}
-reflect = id
+reflect [] = []
+reflect (x:xs) 
+	| isJust $ lookup x reflections = fromJust(lookup x reflections) : reflect xs
+	| otherwise = x: reflect xs
 
 reflections =
   [ ("am",     "are"),
