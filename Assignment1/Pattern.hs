@@ -60,7 +60,10 @@ testTransform = transformationApply '*' id "My name is Zacharias" frenchPresenta
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
-transformationApply wc f xs t =  match wc (fst t) xs 
+transformationApply wc f xs t 
+  | isJust $ matched = Just $ substitute wc (snd t) $ fromJust matched
+  | otherwise = Nothing
+  where matched =  match wc (fst t) xs
 
 
 
