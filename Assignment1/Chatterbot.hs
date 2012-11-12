@@ -36,9 +36,9 @@ stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind _ = return id
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-{- TO BE WRITTEN -}
-rulesApply _ = id
-
+rulesApply [] _ = []
+rulesApply xs p = fromJust $ transformationsApply "*" (reflect) xs p
+ 
 reflect :: Phrase -> Phrase
 reflect [] = []
 reflect (x:xs) 
@@ -77,10 +77,12 @@ prepare :: String -> Phrase
 prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
-{- TO BE WRITTEN -}
-rulesCompile _ = []
+rulesCompile [] = []
+rulesCompile (x:xs) = (prepare $ fst x, listCompile $ snd x) : rulesCompile xs
 
-
+listCompile :: [String] -> [Phrase]
+listCompile [] = []
+listCompile (y:ys) = (prepare y) : listCompile ys 
 --------------------------------------
 
 
