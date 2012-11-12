@@ -58,8 +58,8 @@ matchCheck = matchTest == Just testSubstitutions
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
-transformationApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
+transformationApply wc id str representation = substitute wc snd representation (match wc str fst representation)
+
 
 
 -- Applying a list of patterns until one succeeds
