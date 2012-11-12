@@ -63,7 +63,7 @@ testTransform3 = transformationsApply '*' id listTransform "Small vanilla ice cr
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 transformationApply wc f xs t 
-  | isJust $ matched = Just $ substitute wc (snd t) $ fromJust matched
+  | isJust $ matched = Just $ f $ substitute wc (snd t) $ fromJust matched
   | otherwise = Nothing
   where matched =  match wc (fst t) xs
 
