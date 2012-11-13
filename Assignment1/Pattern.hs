@@ -29,10 +29,10 @@ match wc (p:ps) (x:xs)
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
--- singleWildcardMatch (wc:ps) (x:xs) = mmap (const [x]) (match wc ps xs)  
 singleWildcardMatch (wc:ps) (x:xs) 
   | isJust $ match wc ps xs = Just [x]
   | otherwise = Nothing
+
 longerWildcardMatch (wc:ps) (x:xs) = mmap (x:) (match wc (wc:ps) xs)
 
 
