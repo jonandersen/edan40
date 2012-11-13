@@ -50,12 +50,14 @@ substituteCheck = substituteTest == testString
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
 
-listTransform = [("Large * ice cream", "Un grande glace a'la *"),("My name is *", "Je m'appelle *")]
+listTransform = [("Large * ice cream", "Un grande glace a'la *"),("My name is *", "Je m'appelle *"),("Cats name is *", "Je m'appelle *")]
 listTransform2 = [("Large * ice cream", "Un grande glace a'la *"),("My name is *", "Je m'appelle *")]
 testTransform = transformationsApply '*' id listTransform "My name is Zacharias"
 testTransform2 = transformationsApply '*' id listTransform "Large vanilla ice cream"
 testTransform3 = transformationsApply '*' id listTransform "Small vanilla ice cream"
 
+listTransform3 = [("","Speak up! I can't hear you."),("I need *","Why do you need * ?")]
+testTransform4 = transformationsApply '*' id listTransform3 "I need a cat"
 -------------------------------------------------------
 -- Applying patterns
 --------------------------------------------------------

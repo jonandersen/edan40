@@ -29,15 +29,18 @@ type PhrasePair = (Phrase, Phrase)
 type BotBrain = [(Phrase, [Phrase])]
 
 
---------------------------------------------------------
-
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
-{- TO BE WRITTEN -}
-stateOfMind _ = return id
+stateOfMind brain = do
+   r <- randomIO :: IO Float
+   return (rulesApply (takeOne r brain))
+
+takeOne _ [] = []            
+takeOne r (x:xs) = (fst x, pick r (snd x)): (takeOne r xs)
+
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply [] _ = []
-rulesApply xs p = fromJust $ transformationsApply "*" (reflect) xs p
+rulesApply xs p = fromJust $ (transformationsApply "*" (id) xs p)
 
 reflect :: Phrase -> Phrase
 reflect [] = []
@@ -78,11 +81,11 @@ prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
 rulesCompile [] = []
-rulesCompile (x:xs) = (prepare $ fst x, listCompile $ snd x) : rulesCompile xs
+rulesCompile (x:xs) = ((words . map toLower) $ fst x, listCompile $ snd x) : rulesCompile xs
 
 listCompile :: [String] -> [Phrase]
 listCompile [] = []
-listCompile (y:ys) = (prepare y) : listCompile ys 
+listCompile (y:ys) = (words y) : listCompile ys 
 --------------------------------------
 
 
