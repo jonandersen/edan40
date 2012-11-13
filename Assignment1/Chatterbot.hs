@@ -40,7 +40,7 @@ takeOne r (x:xs) = (fst x, pick r (snd x)): (takeOne r xs)
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply [] _ = []
-rulesApply xs p = fromJust $ (transformationsApply "*" (id) xs p)
+rulesApply xs p = fromJust $ (transformationsApply "*" (reflect) xs p)
 
 reflect :: Phrase -> Phrase
 reflect [] = []
@@ -108,7 +108,6 @@ reduce :: Phrase -> Phrase
 reduce = reductionsApply reductions
 
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
-{- TO BE WRITTEN -}
-reductionsApply _ = id
-
+reductionsApply xs p = fix (try (transformationsApply "*" id xs)) p
+-- Fix ensure that all occurences are replaced.
 

@@ -47,6 +47,11 @@ testString = "a=32;"
 substituteTest = substitute '*' testPattern testSubstitutions
 substituteCheck = substituteTest == testString
 
+testPattern2 = "do you know what * is"
+testSubstitutions2 =  "what is *"
+testString2 =  "do you know what Haskell is"
+substituteTest2 = substitute '*' testPattern2 testSubstitutions2
+
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
 
@@ -56,8 +61,13 @@ testTransform = transformationsApply '*' id listTransform "My name is Zacharias"
 testTransform2 = transformationsApply '*' id listTransform "Large vanilla ice cream"
 testTransform3 = transformationsApply '*' id listTransform "Small vanilla ice cream"
 
+listTransform5 = [( "please *", "*" )]
+testTransform5 = transformationsApply '*' id listTransform5 "can you please tell me what Haskell is"
+
 listTransform3 = [("","Speak up! I can't hear you."),("I need *","Why do you need * ?")]
 testTransform4 = transformationsApply '*' id listTransform3 "I need a cat"
+
+
 -------------------------------------------------------
 -- Applying patterns
 --------------------------------------------------------
