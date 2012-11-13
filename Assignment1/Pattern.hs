@@ -65,7 +65,7 @@ testTransform4 = transformationsApply '*' id listTransform3 "I need a cat"
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 transformationApply wc f xs t 
-  | isJust $ matched = Just $ f $ substitute wc (snd t) $ fromJust matched
+  | isJust $ matched = Just $ substitute wc (snd t) $ f $ fromJust matched
   | otherwise = Nothing
   where matched =  match wc (fst t) xs
 
