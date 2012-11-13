@@ -38,7 +38,7 @@ stateOfMind _ = return id
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply [] _ = []
 rulesApply xs p = fromJust $ transformationsApply "*" (reflect) xs p
- 
+
 reflect :: Phrase -> Phrase
 reflect [] = []
 reflect (x:xs) 
