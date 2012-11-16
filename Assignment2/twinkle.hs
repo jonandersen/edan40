@@ -62,6 +62,6 @@ second = times 4 (cMajor :+: gMajor)
 chords = first :+: second :+: first
 -- Putting it all together:
 twinkle = Instr "piano" (Tempo 2 (Phrase [Dyn SF] chords :=: mainVoice))
-twinkleBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] bassLine :=:mainVoice))
-twinkleCalypsoBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] calypsoBassLine :=:mainVoice))
-twinkleBoogieBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] boogieBassLine :=:mainVoice))
+twinkleBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] chords :=:bassLine :=:mainVoice))
+twinkleCalypsoBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] chords :=:calypsoBassLine :=:mainVoice))
+twinkleBoogieBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] chords :=: boogieBassLine :=:mainVoice))
