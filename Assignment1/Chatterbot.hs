@@ -3,9 +3,6 @@ import Utilities
 import Pattern
 import Random
 import Char
-import Maybe
-
-
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
@@ -42,13 +39,11 @@ takeOne r (x:xs) = (fst x, pick r (snd x)): (takeOne r xs)
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply [] _ = []
-rulesApply xs p = fromJust $ (transformationsApply "*" (reflect) xs p)
+rulesApply xs p = try (transformationsApply "*" (reflect) xs) p
 
 reflect :: Phrase -> Phrase
 reflect [] = []
-reflect (x:xs) 
-	| isJust $ lookup x reflections = fromJust(lookup x reflections) : reflect xs
-	| otherwise = x: reflect xs
+reflect (x:xs) = (try (flip lookup reflections) x ): reflect xs
 
 reflections =
   [ ("am",     "are"),

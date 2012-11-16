@@ -67,6 +67,9 @@ testTransform5 = transformationsApply '*' id listTransform5 "can you please tell
 listTransform3 = [("","Speak up! I can't hear you."),("I need *","Why do you need * ?")]
 testTransform4 = transformationsApply '*' id listTransform3 "I need a cat"
 
+listTransform4 = [("I hate *",  "Why do you hate * ?")] 
+testTransform6 = transformationsApply '*' id listTransform4 "ARGH!"
+
 
 -------------------------------------------------------
 -- Applying patterns
@@ -85,7 +88,7 @@ transformationApply wc f xs t
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ [] _ = Nothing
-transformationsApply wc f (t:ts) xs 
+transformationsApply wc f (t:ts) xs  
   | isJust $ transformationApply wc f xs t  = transformationApply wc f xs t
   | otherwise = transformationsApply wc f ts xs
 
