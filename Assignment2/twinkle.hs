@@ -1,6 +1,7 @@
 module Twinkle where
 import Haskore
- 
+import Ratio 
+
  -- note updaters for mappings
 fd d n = n d v
 vol  n = n   v
@@ -46,13 +47,21 @@ v2a = lmap (fd qn) [g 4,g 4,f 4,f 4,e 4,e 4]
 v2d = lmap vol [d 4 hn]
 v2b = lmap (fd qn) [g 4,g 4,f 4,f 4,e 4,e 4]
 v2 = v2a :+: v2d :+: v2a :+: v2d
-
---v2f = Tempo (3/2) (lmap vol [cs 5 en, d 5 en, cs 5 en]) :+: b 4 (3*dhn+hn) v
  
 mainVoice =  v1 :+: v2 :+: v1
  
+--Chords
+cMajor = foldr1 (:=:) [ Note (x, 4) (1%2) [Volume 60] | x<-[C, E, G] ]
+fMajor = foldr1 (:=:) [ Note (x, 4) (1%2) [Volume 60] | x<-[F, A, C] ]
+gMajor = foldr1 (:=:) [ Note (x, 4) (1%2) [Volume 60] | x<-[G, B, D] ]
+cMajorLong = foldr1 (:=:) [ Note (x, 4) (1%1) [Volume 60] | x<-[C, E, G] ]
+
+first = cMajorLong :+: fMajor :+: cMajor :+: gMajor :+: cMajor :+: gMajor :+: cMajor
+second = times 4 (cMajor :+: gMajor)
+
+chords = first :+: second :+: first
 -- Putting it all together:
-twinkle = Instr "piano" (Tempo 2 (Phrase [Dyn SF] mainVoice))
+twinkle = Instr "piano" (Tempo 2 (Phrase [Dyn SF] chords :=: mainVoice))
 twinkleBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] bassLine :=:mainVoice))
 twinkleCalypsoBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] calypsoBassLine :=:mainVoice))
 twinkleBoogieBass = Instr "piano" (Tempo 2 (Phrase [Dyn SF] boogieBassLine :=:mainVoice))
