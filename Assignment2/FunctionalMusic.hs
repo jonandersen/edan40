@@ -34,7 +34,7 @@ import Ratio
 -- autoChord :: Key -> ChordProgression -> Music
 
 c4 = Note (C, 4) (1%4) [Volume 80]
-Instr "flute" (c4 :+: c4 :+: c4)
+fl = Instr "flute" (c4 :+: c4 :+: c4)
 cMajor = foldr1 (:=:) [ Note (x, 4) (1%2) [Volume 60] | x<-[C, E, G] ]
 
 
