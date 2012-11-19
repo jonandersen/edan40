@@ -32,12 +32,10 @@ stateOfMind brain = do
    return (rulesApply ((map.map2) (id, pick r) brain))
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-rulesApply [] _ = []
-rulesApply xs p = try (transformationsApply "*" (reflect) xs) p
+rulesApply xs = try (transformationsApply "*" (reflect) xs)
 
 reflect :: Phrase -> Phrase
-reflect [] = []
-reflect (x:xs) = (try (flip lookup reflections) x ): reflect xs
+reflect = map (try (flip lookup reflections))
 
 reflections =
   [ ("am",     "are"),
@@ -71,12 +69,8 @@ prepare :: String -> Phrase
 prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
-rulesCompile [] = []
-rulesCompile (x:xs) = ((words . map toLower) $ fst x, listCompile $ snd x) : rulesCompile xs
+rulesCompile = (map.map2) ((words . map toLower) , map words)
 
-listCompile :: [String] -> [Phrase]
-listCompile [] = []
-listCompile (y:ys) = (words y) : listCompile ys 
 --------------------------------------
 
 
@@ -99,6 +93,6 @@ reduce :: Phrase -> Phrase
 reduce = reductionsApply reductions
 
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
-reductionsApply xs p = fix (try (transformationsApply "*" id xs)) p
+reductionsApply xs = fix (try (transformationsApply "*" id xs))
 -- Fix ensure that all occurences are replaced.
 
