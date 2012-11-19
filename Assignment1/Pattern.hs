@@ -88,7 +88,7 @@ transformationApply wc f xs t
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ [] _ = Nothing
-transformationsApply wc f (t:ts) xs  
+transformationsApply wc f (t:ts) xs 
   | isJust $ transformationApply wc f xs t  = transformationApply wc f xs t
   | otherwise = transformationsApply wc f ts xs
 
