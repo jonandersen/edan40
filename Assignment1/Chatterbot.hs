@@ -29,13 +29,7 @@ type BotBrain = [(Phrase, [Phrase])]
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind brain = do
    r <- randomIO :: IO Float
-   return (rulesApply (takeOne r brain))
-
--- Picks one random answer for each question
-takeOne :: (RealFrac r) => r -> BotBrain -> [PhrasePair]
-takeOne _ [] = []            
-takeOne r (x:xs) = (fst x, pick r (snd x)): (takeOne r xs)
-
+   return (rulesApply ((map.map2) (id, pick r) brain))
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply [] _ = []
