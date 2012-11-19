@@ -79,13 +79,7 @@ testTransform6 = transformationsApply '*' id listTransform4 "ARGH!"
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 transformationApply wc f xs t = mmap (substitute wc (snd t)) $ mmap f (match wc (fst t) xs)
 
-
---  foldl (transformationApply wc f xs) ts
-
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ [] _ = Nothing
-transformationsApply wc f (t:ts) xs 
-  | isJust $ transformationApply wc f xs t  = transformationApply wc f xs t
-  | otherwise = transformationsApply wc f ts xs
+transformationsApply wc f ts xs = foldl1 orElse (map (transformationApply wc f xs ) ts)
 
