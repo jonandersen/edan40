@@ -9,6 +9,11 @@
 > dorian = [0, 2, 3, 5, 7, 9, 10]
 > phrygian = [0, 1, 3, 5, 7, 8, 10]
 
+C 1, F 1/2 C 1/2, G 1/2. C 1/2, G 1/2 C 1/2
+C 1/2 G 1/2, C 1/2 G 1/2, C 1/2 G 1/2, C 1/2 G 1/2
+C 1, F 1/2 C 1/2, G 1/2 C 1/2, G 1/2 C 1/2
+
+ChordProgression 
 
 
 > type BassStyle = [Int]
