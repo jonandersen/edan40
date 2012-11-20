@@ -48,8 +48,17 @@ ChordProgression
 
 > type BassStyle = [(Int, Ratio Int)]
 > basic = [(0,hn),(4,hn)]
-> calypso = [(-1,1%4),(0, en),(2, en), (-1, 1%4),(0,en),(2,en)]
+> calypso = [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
 > boogie = [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+
+
+Osäker på om det ska vara så här men ja vi får se sedan:D
+
+
+> type ChordList = [PitchClass]
+> type Chord = (PitchClass, ChordList)
+> type ChordProgression = [(Chord, Ratio Int)]
+> twinkleChords = [(C, 1) ,(F , 1%2), (C, 1%2), (G, 1%2), (C, 1%2), (G, 1%2), (C, 1%2), (C, 1%2), (G, 1%2), (C, 1%2), (G, 1%2), (C, 1%2), (G, 1%2), (C, 1%2), (G, 1%2), (C, 1), (F, 1%2), (C, 1%2), (G, 1%2), (C, 1%2), (G, 1%2), (C, 1%2)]
 
 AutoBass creates the bass line of the song.
 autoBass :: BassStyle -> Key -> ChordProgression -> Music
@@ -57,6 +66,7 @@ autoBass :: BassStyle -> Key -> ChordProgression -> Music
 
 AutoChord generates the chords of the song.
 autoChord :: Key -> ChordProgression -> Music
+
 
 autoComp creates a song with a baseline and chords.
 autoComp :: ChordProgression -> Key -> Music
