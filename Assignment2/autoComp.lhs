@@ -1,6 +1,9 @@
 \section{Haskore CSound Tutorial}
 \label{csound-tut}
 
+> import Haskore
+> import Ratio 
+
 > type Scale = [Int]
 > ionian = [0, 2, 4, 5, 7, 9, 11]
 > lydian = [0, 2, 4, 6, 7, 9, 11	]
@@ -16,10 +19,10 @@ C 1, F 1/2 C 1/2, G 1/2 C 1/2, G 1/2 C 1/2
 ChordProgression 
 
 
-> type BassStyle = [Int]
-> basic = [1,1,1,1,5,5,5,5]
-> calypso = [0,0,1,3,0,0,1,3]
-> boogie = [1,5,6,5,1,5,6,5]
+> type BassStyle = [(Int, Ratio Int)]
+> basic = [(0,hn),(4,hn)]
+> calypso = [(-1,1%4),(0, en),(2, en), (-1, 1%4),(0,en),(2,en)]
+> boogie = [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
 
 AutoBass creates the bass line of the song.
 autoBass :: BassStyle -> Key -> ChordProgression -> Music
