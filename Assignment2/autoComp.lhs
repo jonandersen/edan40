@@ -9,15 +9,12 @@
 
 Our model for chords, can be expanded
 
+progression :: Key -> [Integer]
 
-progression key = 
-
-> prog = [0,4,7]
-												
+> progression (note, mode)
+> 	| mode == Major = [0,4,7]
+> 	| otherwise = [0,3,7]								
 						
-This function is lacking the key, don't see how it would impact if not a minor scale.
-Should be fixed so it takes the key to.						
-
 > getChord :: PitchClass -> [Integer] -> [PitchClass]																
 > getChord _ [] = []											
 > getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
@@ -49,7 +46,7 @@ AutoChord generates the chords of the song.
  autoChord :: Key -> ChordProgression -> [Music]
 
 > autoChord _ [] = [] 
-> autoChord key ((c,d):cs) = (mapChord (getChord c prog) d) : autoChord key cs
+> autoChord key ((n,d):cs) = (mapChord (getChord n $ progression key) d) : autoChord key cs
 
 
 autoComp creates a song with a baseline and chords.
