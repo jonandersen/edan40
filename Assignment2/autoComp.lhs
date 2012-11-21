@@ -9,18 +9,22 @@
 
 Our model for chords, can be expanded
 
+
+progression key = 
+
 > prog = [0,4,7]
 												
 						
 This function is lacking the key, don't see how it would impact if not a minor scale.
 Should be fixed so it takes the key to.						
-																
+
+> getChord :: PitchClass -> [Integer] -> [PitchClass]																
 > getChord _ [] = []											
 > getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
 
 This maps some notes to a chord. 
 
-> mapChord :: [PitchClass] -> Dur -> Music
+> mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note (x, 4) dur [Volume 60] | x <- chord ]
 
 
@@ -29,8 +33,8 @@ This maps some notes to a chord.
 > calypso = [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
 > boogie = [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
 
-> type ChordList = [PitchClass]
-> type Chord = (PitchClass, ChordList)
+> type NoteList = [PitchClass]
+> type Chord = (PitchClass, NoteList)
 > type ChordProgression = [(PitchClass, Dur)]
 > twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
 
@@ -140,11 +144,11 @@ MIGHT COME IN HANDY
 > phrygian = [0, 1, 3, 5, 7, 8, 10]
 
 Position		Major chord		Minor chord
-1		Ionian		
-2		Mixolydian		Dorian
-3									Phrygian
-4		Lydian		
-5		Mixolydian		
-6									Aeolian
+1						Ionian		
+2						Mixolydian		Dorian
+3													Phrygian
+4						Lydian		
+5						Mixolydian		
+6													Aeolian
 7
 
