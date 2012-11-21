@@ -44,16 +44,18 @@ Our model for chords, can be expanded
 > boogie = [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
 
 autoBass bs key cp = 
-	
+
 testBass b:bs x:xs = 
 
 TODO	
-applyPattern chord pattern = 
 
-> splitWholeChord :: Chord -> [Chord] 
-> splitWholeChord chord 
->		| snd chord == wn = [(fst chord, hn),(fst chord, hn)]
->		| otherwise  = [chord]
+ basicPattern c:chordList 
+
+> splitWholeChord :: [Chord] -> [Chord] 
+> splitWholeChord [] = []
+> splitWholeChord (x:xs)
+>		| snd x == wn = concat [[(fst x, hn),(fst x, hn)], splitWholeChord xs]
+>		| otherwise  = x: splitWholeChord xs
 
 
 Note (x, 4) (1%2) [Volume 60]
@@ -131,8 +133,9 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 
 > testGetChord = (getChord F [0,4,7])
 
-> testSplitWholeChord1 = splitWholeChord (C, wn)
-> testSplitWholeChord2 = splitWholeChord (C, hn)
+> testSplitWholeChord1 = splitWholeChord [(C, wn)]
+> testSplitWholeChord2 = splitWholeChord [(C, hn)]
+> testSplitWholeChord3 = splitWholeChord twinkleChords
 
 
 MIGHT COME IN HANDY
