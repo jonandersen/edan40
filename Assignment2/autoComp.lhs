@@ -5,40 +5,99 @@
 > import Ratio 
 > import Maybe
 
+///UTIL STUFF///
+
+> type NoteList = [PitchClass]
+> type Chord = (PitchClass, Dur)
+> type ChordProgression = [(PitchClass, Dur)]
+> twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
+
+
+
+c = (C, Major)
+f = (F, Major)
+g = (G, Major)
+
+
+> fd d n = n d v
+> vol  n = n   v
+> v      = [Volume 100]
+> lmap f l = line (map f l)
+
+Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
+
+> lookupts :: [(PitchClass, Int)] -> Int -> PitchClass
+> lookupts ((t1,t2):ts) m
+>		| m == t2 = t1
+>		| otherwise = lookupts ts m
+
+
+> lookuptf :: [(PitchClass, Int)] -> PitchClass -> Int
+> lookuptf ((t1,t2):ts) m
+>		| m == t1 = t2
+>		| otherwise = lookuptf ts m
+
+
 > notes = [(C, 0),(Cs, 1), (D, 2),(Ds, 3),(E, 4), (F, 5),(Fs, 6),(G, 7),(Gs, 8),(A, 9), (As, 10), (B, 11) ]
 
 Our model for chords, can be expanded
 
 progression :: Key -> [Integer]
 
+///BASS///
+
+> type BassStyle = [(Int, Dur)]
+> basic = [(0,hn),(4,hn)]
+> calypso = repeat [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
+> boogie = repeat [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+
+autoBass bs key cp =
+	
+WARNING INGEN RECURSION ÄN!!!!!!! 
+
+> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
+> basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
+
+
+lmap vol [cs 5 (dhn+dhn), d 5 dhn, 
+bf o = Note (Bf,o);
+
+> splitWholeChord :: [Chord] -> [Chord] 
+> splitWholeChord [] = []
+> splitWholeChord (x:xs)
+>		| snd x == wn = concat [[(fst x, hn),(fst x, hn)], splitWholeChord xs]
+>		| otherwise  = x: splitWholeChord xs
+
+
+Note (x, 4) (1%2) [Volume 60]
+13/12 = 1   3+notesPosition/12
+b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
+
+///CHORDS///
+
+
 > progression (note, mode)
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
-						
-> getChord :: PitchClass -> [Integer] -> [PitchClass]																
+																					
+
+This function is lacking the key, don't see how it would impact if not a minor scale.
+Should be fixed so it takes the key to.						
+
+> getChord :: PitchClass -> [Int] -> [PitchClass]																
+
 > getChord _ [] = []											
 > getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
+> getSingleChord :: PitchClass -> Int -> PitchClass
+> getSingleChord n p = (lookupts notes (mod ((lookuptf notes n) + p) 12 ))
 
 This maps some notes to a chord. 
 
 > mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note (x, 4) dur [Volume 60] | x <- chord ]
 
+///AUTOMUSIC///
 
-> type BassStyle = [(Int, Dur)]
-> basic = [(0,hn),(4,hn)]
-> calypso = [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
-> boogie = [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
-
-> type NoteList = [PitchClass]
-> type Chord = (PitchClass, NoteList)
-> type ChordProgression = [(PitchClass, Dur)]
-
-> c = (C, Major)
-> f = (F, Major)
-> g = (G, Major)
-
-> twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
 
 
 stairwayChords = [(A, Minor), hn]
@@ -46,12 +105,11 @@ stairwayChords = [(A, Minor), hn]
 AutoBass creates the bass line of the song.
 autoBass :: BassStyle -> Key -> ChordProgression -> Music
 
-
 AutoChord generates the chords of the song.
 
 																					Needs to be updated
 
- autoChord :: Key -> ChordProgression -> [Music]
+ autoChord :: Key -> ChordProgression -> Music
 
 > autoChord _ [] = [] 
 > autoChord key ((n,d):cs) = (mapChord (getChord n $ progression key) d) : autoChord key cs
@@ -88,54 +146,15 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 > twinkleMelody =  Instr "piano"$ Tempo 2 $ v1 :+: v2 :+: v1
 
 
-
-
-
-
-
-TESTS
+///TESTS///
 
 > testGetChord = (getChord F [0,4,7])
+> testGetChord2 = (getChord C [1])
+> testSplitWholeChord1 = splitWholeChord [(C, wn)]
+> testSplitWholeChord2 = splitWholeChord [(C, hn)]
+> testSplitWholeChord3 = splitWholeChord twinkleChords
 
-
-
-
-
-
-
-
-UTIL STUFF
-
-
-> fd d n = n d v
-> vol  n = n   v
-> v      = [Volume 100]
-> lmap f l = line (map f l)
-
-Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
-
-> lookupts :: [(PitchClass, Integer)] -> Integer -> PitchClass
-> lookupts ((t1,t2):ts) m
->		| m == t2 = t1
->		| otherwise = lookupts ts m
-
-
-> lookuptf :: [(PitchClass, Integer)] -> PitchClass -> Integer
-> lookuptf ((t1,t2):ts) m
->		| m == t1 = t2
->		| otherwise = lookuptf ts m
-
-
-
-
-
-
-
-
-
-
-
-
+> testBasicPattern = basicPattern twinkleChords basic
 
 
 MIGHT COME IN HANDY
