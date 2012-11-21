@@ -20,13 +20,13 @@
 
 Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
 
-> lookupts :: [(PitchClass, Integer)] -> Integer -> PitchClass
+> lookupts :: [(PitchClass, Int)] -> Int -> PitchClass
 > lookupts ((t1,t2):ts) m
 >		| m == t2 = t1
 >		| otherwise = lookupts ts m
 
 
-> lookuptf :: [(PitchClass, Integer)] -> PitchClass -> Integer
+> lookuptf :: [(PitchClass, Int)] -> PitchClass -> Int
 > lookuptf ((t1,t2):ts) m
 >		| m == t1 = t2
 >		| otherwise = lookuptf ts m
@@ -40,16 +40,19 @@ Our model for chords, can be expanded
 
 > type BassStyle = [(Int, Dur)]
 > basic = [(0,hn),(4,hn)]
-> calypso = [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
-> boogie = [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+> calypso = repeat [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
+> boogie = repeat [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
 
-autoBass bs key cp = 
+autoBass bs key cp =
+	
+WARNING INGEN RECURSION ÄN!!!!!!! 
 
-testBass b:bs x:xs = 
+> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
+> basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
 
-TODO	
 
- basicPattern c:chordList 
+lmap vol [cs 5 (dhn+dhn), d 5 dhn, 
+bf o = Note (Bf,o);
 
 > splitWholeChord :: [Chord] -> [Chord] 
 > splitWholeChord [] = []
@@ -72,9 +75,11 @@ progression key =
 This function is lacking the key, don't see how it would impact if not a minor scale.
 Should be fixed so it takes the key to.						
 
-> getChord :: PitchClass -> [Integer] -> [PitchClass]																
+> getChord :: PitchClass -> [Int] -> [PitchClass]																
 > getChord _ [] = []											
 > getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
+> getSingleChord :: PitchClass -> Int -> PitchClass
+> getSingleChord n p = (lookupts notes (mod ((lookuptf notes n) + p) 12 ))
 
 This maps some notes to a chord. 
 
@@ -132,10 +137,12 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 ///TESTS///
 
 > testGetChord = (getChord F [0,4,7])
-
+> testGetChord2 = (getChord C [1])
 > testSplitWholeChord1 = splitWholeChord [(C, wn)]
 > testSplitWholeChord2 = splitWholeChord [(C, hn)]
 > testSplitWholeChord3 = splitWholeChord twinkleChords
+
+> testBasicPattern = basicPattern twinkleChords basic
 
 
 MIGHT COME IN HANDY
