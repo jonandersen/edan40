@@ -33,7 +33,15 @@ This maps some notes to a chord.
 > type NoteList = [PitchClass]
 > type Chord = (PitchClass, NoteList)
 > type ChordProgression = [(PitchClass, Dur)]
+
+> c = (C, Major)
+> f = (F, Major)
+> g = (G, Major)
+
 > twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
+
+
+stairwayChords = [(A, Minor), hn]
 
 AutoBass creates the bass line of the song.
 autoBass :: BassStyle -> Key -> ChordProgression -> Music
