@@ -13,7 +13,9 @@
 > type ChordProgression = [(Key, Dur)]
 > type Triad = [Int]
 > twinkleChords = [(cmaj, wn) ,(fmaj , hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, wn), (fmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn)]
+> twinkleChordsMayBeBetter = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
 
+///Tror att vi ska ha major i våran KEY så att den ser ut så här istället Key = (C, Major)/////
 
 
 > cmaj = (C, Major)
@@ -49,27 +51,33 @@ progression :: Key -> [Integer]
 ///BASS///
 
 > type BassStyle = [(Int, Dur)]
-> basic = [(0,hn),(4,hn)]
-> calypso = repeat [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
-> boogie = repeat [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+> basic = cycle [(0,hn),(4,hn)]
+> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
+> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
 
-autoBass bs key cp =
+Only basic atm
+
+autoBass bs key cp = basicPattern cp cl
 	
-WARNING INGEN RECURSION ÄN!!!!!!! 
 
+> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> Music
+> basicPattern [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> basicPattern _ [] = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> basicPattern (c:cl) (b:bl) = foldr1 (:=:) [Note (note, pitch ) (snd b) [Volume 80]] :+: basicPattern cl bl
+> 	where
+> 	note = getSingleChord (fst c) (fst b)
+> 	pitch = 3 + div (lookuptf notes (fst c)) 12
 
-basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
-basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
+> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChordsMayBeBetter) basic) 
 
-
-lmap vol [cs 5 (dhn+dhn), d 5 dhn, 
-bf o = Note (Bf,o);
 
 > splitWholeChord :: [Chord] -> [Chord] 
 > splitWholeChord [] = []
 > splitWholeChord (x:xs)
->		| snd x == wn = concat [[(fst x, hn),(fst x, hn)], splitWholeChord xs]
+>		| snd x == wn = splitPair ++ splitWholeChord xs
 >		| otherwise  = x: splitWholeChord xs
+> 	where
+> 	splitPair = [(fst x, hn), (fst x, hn)]
 
 
 Note (x, 4) (1%2) [Volume 60]
@@ -121,9 +129,6 @@ autoComp creates a song with a baseline and chords.
 > autoComp cp key = Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))
 
 
-
-
-
 > twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
 
 twinkleBasic   = twinkleMelody :=: autoComp basic (C, Major) twinkleChords
@@ -150,11 +155,11 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 > testGetChord = (createChord F [0,4,7])
 > testGetChord2 = (createChord C [1])
 
- testSplitWholeChord1 = splitWholeChord [(cmaj, wn)]
- testSplitWholeChord2 = splitWholeChord [(cmaj, hn)]
- testSplitWholeChord3 = splitWholeChord twinkleChords
+> testSplitWholeChord1 = splitWholeChord [(C, wn)]
+> testSplitWholeChord2 = splitWholeChord [(C, hn)]
+> testSplitWholeChord3 = splitWholeChord twinkleChordsMayBeBetter
 
-testBasicPattern = basicPattern twinkleChords basic
+> testBasicPattern = basicPattern (splitWholeChord twinkleChordsMayBeBetter)  basic
 
 
 MIGHT COME IN HANDY
