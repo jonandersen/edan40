@@ -82,15 +82,11 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
 																					
-
-This function is lacking the key, don't see how it would impact if not a minor scale.
-Should be fixed so it takes the key to.						
-
 If C, [0,4,7] -> [C,E,G]
 
-> getChord :: PitchClass -> Triad -> NoteList															
-> getChord _ [] = []											
-> getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
+> createChord :: PitchClass -> Triad -> NoteList															
+> createChord _ [] = []											
+> createChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : createChord n ps
 
 > getSingleChord :: PitchClass -> Int -> PitchClass
 > getSingleChord n p = (lookupts notes (mod ((lookuptf notes n) + p) 12 ))
@@ -115,7 +111,7 @@ AutoChord generates the chords of the song.
 
 > autoChord :: Key -> ChordProgression -> [Music]
 > autoChord _ [] = [] 
-> autoChord rootKey ((key,dur):keys) = (mapChord (getChord (fst key) $ findTriad rootKey $ key) dur) : autoChord rootKey keys
+> autoChord rootKey ((key,dur):keys) = (mapChord (createChord (fst key) $ findTriad rootKey $ key) dur) : autoChord rootKey keys
 
 
 autoComp creates a song with a baseline and chords.
@@ -150,8 +146,8 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 
 ///TESTS///
 
-> testGetChord = (getChord F [0,4,7])
-> testGetChord2 = (getChord C [1])
+> testGetChord = (createChord F [0,4,7])
+> testGetChord2 = (createChord C [1])
 
  testSplitWholeChord1 = splitWholeChord [(cmaj, wn)]
  testSplitWholeChord2 = splitWholeChord [(cmaj, hn)]
