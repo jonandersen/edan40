@@ -86,8 +86,9 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 This function is lacking the key, don't see how it would impact if not a minor scale.
 Should be fixed so it takes the key to.						
 
-> getChord :: PitchClass -> [Int] -> [PitchClass]																
+If C, [0,4,7] -> [C,E,G]
 
+> getChord :: PitchClass -> Triad -> NoteList															
 > getChord _ [] = []											
 > getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
 
