@@ -1,16 +1,17 @@
 \section{Haskore CSound Tutorial}
 \label{csound-tut}
 
-> import Haskore
+> module AutoComp where
+> import Haskore hiding (Key)
 > import Ratio 
-> import Maybe
 
 ///UTIL STUFF///
 
-> type Key2 = (PitchClass, Mode)
+> type Key = (PitchClass, Mode)
 > type NoteList = [PitchClass]
 > type Chord = (PitchClass, Dur)
-> type ChordProgression = [(Key2, Dur)]
+> type ChordProgression = [(Key, Dur)]
+> type Triad = [Int]
 > twinkleChords = [(cmaj, wn) ,(fmaj , hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, wn), (fmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn)]
 
 
@@ -76,8 +77,8 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 
 ///CHORDS///
 
-
-> progression key (note, mode)
+> findTriad :: Key -> Key -> Triad
+> findTriad rootKey (note, mode)
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
 																					
@@ -111,14 +112,14 @@ AutoChord generates the chords of the song.
 
 																					Needs to be updated
 
-> autoChord :: Key2 -> ChordProgression -> [Music]
+> autoChord :: Key -> ChordProgression -> [Music]
 > autoChord _ [] = [] 
-> autoChord rootKey ((key,dur):keys) = (mapChord (getChord (fst key) $ progression rootKey $ key) dur) : autoChord rootKey keys
+> autoChord rootKey ((key,dur):keys) = (mapChord (getChord (fst key) $ findTriad rootKey $ key) dur) : autoChord rootKey keys
 
 
 autoComp creates a song with a baseline and chords.
 
-> autoComp :: ChordProgression -> Key2 -> Music
+> autoComp :: ChordProgression -> Key -> Music
 > autoComp cp key = Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))
 
 
