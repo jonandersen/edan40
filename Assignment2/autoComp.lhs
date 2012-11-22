@@ -48,7 +48,7 @@ autoBass bs key cp =
 WARNING INGEN RECURSION ÄN!!!!!!! 
 
 > basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
-> basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
+> basicPattern (c:cl) (b:bl) = foldr1 (:=:) [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
 
 
 lmap vol [cs 5 (dhn+dhn), d 5 dhn, 
