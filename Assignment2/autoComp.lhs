@@ -41,7 +41,7 @@ Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor det
 >		| otherwise = lookuptf ts m
 
 
-> notes = [(C, 0),(Cs, 1), (D, 2),(Ds, 3),(E, 4), (F, 5),(Fs, 6),(G, 7),(Gs, 8),(A, 9), (As, 10), (B, 11) ]
+> notes = zip [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B][0,1..]
 
 Our model for chords, can be expanded
 
