@@ -7,16 +7,17 @@
 
 ///UTIL STUFF///
 
+> type Key2 = (PitchClass, Mode)
 > type NoteList = [PitchClass]
 > type Chord = (PitchClass, Dur)
-> type ChordProgression = [(PitchClass, Dur)]
-> twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
+> type ChordProgression = [(Key2, Dur)]
+> twinkleChords = [(cmaj, wn) ,(fmaj , hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, wn), (fmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn)]
 
 
 
-c = (C, Major)
-f = (F, Major)
-g = (G, Major)
+> cmaj = (C, Major)
+> fmaj = (F, Major)
+> gmaj = (G, Major)
 
 
 > fd d n = n d v
@@ -55,8 +56,8 @@ autoBass bs key cp =
 	
 WARNING INGEN RECURSION ÄN!!!!!!! 
 
-> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
-> basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
+basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
+basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
 
 
 lmap vol [cs 5 (dhn+dhn), d 5 dhn, 
@@ -76,7 +77,7 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 ///CHORDS///
 
 
-> progression (note, mode)
+> progression key (note, mode)
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
 																					
@@ -109,23 +110,21 @@ AutoChord generates the chords of the song.
 
 																					Needs to be updated
 
- autoChord :: Key -> ChordProgression -> Music
-
+> autoChord :: Key2 -> ChordProgression -> [Music]
 > autoChord _ [] = [] 
-> autoChord key ((n,d):cs) = (mapChord (getChord n $ progression key) d) : autoChord key cs
+> autoChord rootKey (key:keys) = (mapChord (getChord (fst (fst key)) $ progression rootKey $ fst key)(snd key)) : autoChord rootKey keys
 
 
 autoComp creates a song with a baseline and chords.
 
-autoComp :: ChordProgression -> Key -> Music
-
+> autoComp :: ChordProgression -> Key2 -> Music
 > autoComp cp key = Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))
 
 
 
 
 
-> twinkleWithChords = twinkleMelody :=: autoComp twinkleChords (C, Major) 
+> twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
 
 twinkleBasic   = twinkleMelody :=: autoComp basic (C, Major) twinkleChords
 twinkleCalypso = twinkleMelody :=: autoComp calypso (C, Major) twinkleChords
@@ -150,11 +149,12 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 
 > testGetChord = (getChord F [0,4,7])
 > testGetChord2 = (getChord C [1])
-> testSplitWholeChord1 = splitWholeChord [(C, wn)]
-> testSplitWholeChord2 = splitWholeChord [(C, hn)]
-> testSplitWholeChord3 = splitWholeChord twinkleChords
 
-> testBasicPattern = basicPattern twinkleChords basic
+ testSplitWholeChord1 = splitWholeChord [(cmaj, wn)]
+ testSplitWholeChord2 = splitWholeChord [(cmaj, hn)]
+ testSplitWholeChord3 = splitWholeChord twinkleChords
+
+testBasicPattern = basicPattern twinkleChords basic
 
 
 MIGHT COME IN HANDY
