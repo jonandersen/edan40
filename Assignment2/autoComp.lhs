@@ -89,6 +89,7 @@ Should be fixed so it takes the key to.
 
 > getChord _ [] = []											
 > getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
+
 > getSingleChord :: PitchClass -> Int -> PitchClass
 > getSingleChord n p = (lookupts notes (mod ((lookuptf notes n) + p) 12 ))
 
@@ -112,7 +113,7 @@ AutoChord generates the chords of the song.
 
 > autoChord :: Key2 -> ChordProgression -> [Music]
 > autoChord _ [] = [] 
-> autoChord rootKey (key:keys) = (mapChord (getChord (fst (fst key)) $ progression rootKey $ fst key)(snd key)) : autoChord rootKey keys
+> autoChord rootKey ((key,dur):keys) = (mapChord (getChord (fst key) $ progression rootKey $ key) dur) : autoChord rootKey keys
 
 
 autoComp creates a song with a baseline and chords.
