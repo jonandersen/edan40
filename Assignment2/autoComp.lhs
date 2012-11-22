@@ -1,16 +1,24 @@
 \section{Haskore CSound Tutorial}
 \label{csound-tut}
 
-> import Haskore
+> module AutoComp where
+> import Haskore hiding (Key)
 > import Ratio 
-> import Maybe
 
 ///UTIL STUFF///
 
+> type Key = (PitchClass, Mode)
 > type NoteList = [PitchClass]
 > type Chord = (PitchClass, Dur)
-> type ChordProgression = [(PitchClass, Dur)]
-> twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
+> type ChordProgression = [(Key, Dur)]
+> type Triad = [Int]
+> twinkleChords = [(cmaj, wn) ,(fmaj , hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, wn), (fmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn)]
+
+
+
+> cmaj = (C, Major)
+> fmaj = (F, Major)
+> gmaj = (G, Major)
 
 
 > fd d n = n d v
@@ -36,6 +44,8 @@ Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor det
 
 Our model for chords, can be expanded
 
+progression :: Key -> [Integer]
+
 ///BASS///
 
 > type BassStyle = [(Int, Dur)]
@@ -47,8 +57,9 @@ autoBass bs key cp =
 	
 WARNING INGEN RECURSION ÄN!!!!!!! 
 
-> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
-> basicPattern (c:cl) (b:bl) = foldr1 (:=:) [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
+
+basicPattern :: [(PitchClass, Dur)] -> BassStyle -> [Music]
+basicPattern (c:cl) (b:bl) = [Note (getSingleChord (fst c) (fst b), (3+ div (lookuptf notes (fst c)) 12) )  (snd b) [Volume 80]]
 
 
 lmap vol [cs 5 (dhn+dhn), d 5 dhn, 
@@ -67,17 +78,17 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 
 ///CHORDS///
 
-progression key = 
+> findTriad :: Key -> Key -> Triad
+> findTriad rootKey (note, mode)
+> 	| mode == Major = [0,4,7]
+> 	| otherwise = [0,3,7]								
+																					
+If C, [0,4,7] -> [C,E,G]
 
-> prog = [0,4,7]
-												
-						
-This function is lacking the key, don't see how it would impact if not a minor scale.
-Should be fixed so it takes the key to.						
+> createChord :: PitchClass -> Triad -> NoteList															
+> createChord _ [] = []											
+> createChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : createChord n ps
 
-> getChord :: PitchClass -> [Int] -> [PitchClass]																
-> getChord _ [] = []											
-> getChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : getChord n ps
 > getSingleChord :: PitchClass -> Int -> PitchClass
 > getSingleChord n p = (lookupts notes (mod ((lookuptf notes n) + p) 12 ))
 
@@ -86,9 +97,11 @@ This maps some notes to a chord.
 > mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note (x, 4) dur [Volume 60] | x <- chord ]
 
-
-
 ///AUTOMUSIC///
+
+
+
+stairwayChords = [(A, Minor), hn]
 
 AutoBass creates the bass line of the song.
 autoBass :: BassStyle -> Key -> ChordProgression -> Music
@@ -97,23 +110,21 @@ AutoChord generates the chords of the song.
 
 																					Needs to be updated
 
- autoChord :: Key -> ChordProgression -> Music
-
+> autoChord :: Key -> ChordProgression -> [Music]
 > autoChord _ [] = [] 
-> autoChord key ((c,d):cs) = (mapChord (getChord c prog) d) : autoChord key cs
+> autoChord rootKey ((key,dur):keys) = (mapChord (createChord (fst key) $ findTriad rootKey $ key) dur) : autoChord rootKey keys
 
 
 autoComp creates a song with a baseline and chords.
 
-autoComp :: ChordProgression -> Key -> Music
-
+> autoComp :: ChordProgression -> Key -> Music
 > autoComp cp key = Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))
 
 
 
 
 
-> twinkleWithChords = twinkleMelody :=: autoComp twinkleChords (C, Major) 
+> twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
 
 twinkleBasic   = twinkleMelody :=: autoComp basic (C, Major) twinkleChords
 twinkleCalypso = twinkleMelody :=: autoComp calypso (C, Major) twinkleChords
@@ -136,13 +147,14 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 
 ///TESTS///
 
-> testGetChord = (getChord F [0,4,7])
-> testGetChord2 = (getChord C [1])
-> testSplitWholeChord1 = splitWholeChord [(C, wn)]
-> testSplitWholeChord2 = splitWholeChord [(C, hn)]
-> testSplitWholeChord3 = splitWholeChord twinkleChords
+> testGetChord = (createChord F [0,4,7])
+> testGetChord2 = (createChord C [1])
 
-> testBasicPattern = basicPattern twinkleChords basic
+ testSplitWholeChord1 = splitWholeChord [(cmaj, wn)]
+ testSplitWholeChord2 = splitWholeChord [(cmaj, hn)]
+ testSplitWholeChord3 = splitWholeChord twinkleChords
+
+testBasicPattern = basicPattern twinkleChords basic
 
 
 MIGHT COME IN HANDY
