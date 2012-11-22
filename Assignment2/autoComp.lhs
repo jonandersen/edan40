@@ -60,15 +60,20 @@ Only basic atm
 autoBass bs key cp = basicPattern cp cl
 	
 
-> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> Music
-> basicPattern [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> basicPattern _ [] = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> basicPattern (c:cl) (b:bl) = foldr1 (:=:) [Note (note, pitch ) (snd b) [Volume 80]] :+: basicPattern cl bl
+> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> Scale -> Music
+> basicPattern [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> basicPattern _ [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> basicPattern (c:cl) (b:bl) sc = foldr1 (:=:) [Note (fst note, pitch ) (snd b) [Volume 80]] :+: basicPattern cl bl sc
 > 	where
-> 	note = getSingleChord (fst c) (fst b)
+> 	note = (!!) notes  (mod (((!!) sc (fst b)) + (lookuptf notes (fst c))) 12)
 > 	pitch = 3 + div (lookuptf notes (fst c)) 12
 
-> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChordsMayBeBetter) basic) 
+
+		[PitchClass, INT]									INT
+(!!) notes  ((!!) sc (mod ((lookuptf notes (fst c) ) + fst b) 12))
+--note = getSingleChord (fst c) (fst b)
+
+> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChordsMayBeBetter) basic ionian) 
 
 
 > splitWholeChord :: [Chord] -> [Chord] 
