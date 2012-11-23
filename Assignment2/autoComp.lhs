@@ -147,8 +147,7 @@ AutoChord generates the chords of the song.
 autoComp creates a song with a baseline and chords.
 
 > autoComp :: ChordProgression -> Key -> Music
-> autoComp cp key = (Tempo 2 $ autoBass calypso ionian cp)
-
+> autoComp cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass calypso ionian $ splitToCalypso cp)
 
 MIGHT COME IN HANDY
 
