@@ -86,9 +86,8 @@ autoBass bs key cp = basicPattern cp cl
 > 	| snd x == wn = totalSplit ++ splitToCalypso xs
 > 	| snd x == hn = partialSplit ++ splitToCalypso xs
 > 	where
-> 	totalSplit = [(fst x, qn), (fst x, en),(fst x, en)]
-> 	partialSplit = [(fst x, qn)] ++ [(nextChord, en), (nextChord, en)]
-> 	nextChord = fst $ head xs
+> 	totalSplit = [(fst x, qn), (fst x, en),(fst x, en),(fst x, qn), (fst x, en),(fst x, en)]
+> 	partialSplit = [(fst x, qn),(fst x, en), (fst x, en)]
 
 > splitToBoogie :: [Chord] -> [Chord]
 > splitToBoogie [] = []
