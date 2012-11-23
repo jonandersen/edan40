@@ -8,7 +8,7 @@
 ///UTIL STUFF///
 
 > type Key = (PitchClass, Mode)
-> type NoteList = [PitchClass]
+> type NoteList = [(PitchClass, Octave)]
 > type Chord = (PitchClass, Dur)
 > type ChordProgression = [Chord]
 > type Triad = [Int]
@@ -118,12 +118,12 @@ If C, [0,4,7] -> [C,E,G]
 
 > createChord :: PitchClass -> Triad -> NoteList															
 > createChord _ [] = []											
-> createChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : createChord n ps
+> createChord n (p:ps) = ((lookupts notes (mod ((lookuptf notes n) + p) 12 )), 4) : createChord n ps
 
 This maps some notes to a chord. 
 
 > mapChord :: NoteList -> Dur -> Music
-> mapChord chord dur = foldr1 (:=:) [ Note (x, 4) dur [Volume 60] | x <- chord ]
+> mapChord chord dur = foldr1 (:=:) [ Note x dur [Volume 60] | x <- chord ]
 
 ///AUTOMUSIC///
 
