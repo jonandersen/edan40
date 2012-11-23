@@ -68,18 +68,36 @@ autoBass bs key cp = basicPattern cp cl
 > 	pitch = 3 + div (lookuptf notes (fst c)) 12
 
 
-> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChords) basic ionian) 
+> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToBasicChord twinkleChords) basic ionian) 
+> twinkleWithBoogieBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToBoogie twinkleChords) boogie ionian) 
 
 
-
-> splitWholeChord :: [Chord] -> [Chord] 
-> splitWholeChord [] = []
-> splitWholeChord (x:xs)
->		| snd x == wn = splitPair ++ splitWholeChord xs
->		| otherwise  = x: splitWholeChord xs
+> splitToBasicChord :: [Chord] -> [Chord] 
+> splitToBasicChord [] = []
+> splitToBasicChord (x:xs)
+>		| snd x == wn = splitPair ++ splitToBasicChord xs
+>		| otherwise  = x: splitToBasicChord xs
 > 	where
 > 	splitPair = [(fst x, hn), (fst x, hn)]
 
+> splitToCalypso :: [Chord] -> [Chord]
+> splitToCalypso [] = []
+> splitToCalypso (x:xs)
+> 	| snd x == wn = totalSplit ++ splitToCalypso xs
+> 	| snd x == hn = partialSplit ++ splitToCalypso xs
+> 	where
+> 	totalSplit = [(fst x, qn), (fst x, en),(fst x, en)]
+> 	partialSplit = [(fst x, qn)] ++ [(nextChord, en), (nextChord, en)]
+> 	nextChord = fst $ head xs
+
+> splitToBoogie :: [Chord] -> [Chord]
+> splitToBoogie [] = []
+> splitToBoogie (x:xs)
+> 	| snd x == wn = splitEight ++ splitToBoogie xs
+> 	| snd x == hn = splitQuarter ++ splitToBoogie xs
+> 	where
+> 	splitEight = [(fst x, en), (fst x, en),(fst x, en), (fst x, en),(fst x, en), (fst x, en),(fst x, en), (fst x, en)]
+> 	splitQuarter = [(fst x, en), (fst x, en),(fst x, en), (fst x, en)]
 
 Note (x, 4) (1%2) [Volume 60]
 13/12 = 1   3+notesPosition/12
@@ -156,12 +174,14 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 > testGetChord = (createChord F [0,4,7])
 > testGetChord2 = (createChord C [1])
 
-> testSplitWholeChord1 = splitWholeChord [(C, wn)]
-> testSplitWholeChord2 = splitWholeChord [(C, hn)]
-> testSplitWholeChord3 = splitWholeChord twinkleChords
+> testSplitWholeChord1 = splitToBasicChord [(C, wn)]
+> testSplitWholeChord2 = splitToBasicChord [(C, hn)]
+> testSplitWholeChord3 = splitToBasicChord twinkleChords
 
-> testBasicPattern = basicPattern (splitWholeChord twinkleChords)  basic
-
+> testBasicPattern = basicPattern (splitToBasicChord twinkleChords)  basic ionian
+> testBoogiePattern = basicPattern (splitToBoogie twinkleChords)  boogie ionian
+> testSplitToCalypso = splitToCalypso twinkleChords
+> testSplitToBoogie = splitToBoogie twinkleChords
 
 MIGHT COME IN HANDY
 
