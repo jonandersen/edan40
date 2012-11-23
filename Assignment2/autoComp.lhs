@@ -62,15 +62,20 @@ autoBass bs key cp = basicPattern cp cl
 > basicPattern :: [(PitchClass, Dur)] -> BassStyle -> Scale -> Music
 > basicPattern [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
 > basicPattern _ [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> basicPattern (c:cl) (b:bl) sc = foldr1 (:=:) [Note (fst note, pitch ) (snd b) [Volume 80]] :+: basicPattern cl bl sc
+> basicPattern (c:cl) (b:bl) sc = foldr1 (:=:) (handleRest c b sc) :+: basicPattern cl bl sc
+
+> handleRest c1 b1 sc1
+> 	|fst b1 == -1 = [Rest (snd b1)]
+> 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 80]]
 > 	where
-> 	note = (!!) notes  (mod (((!!) sc (fst b)) + (lookuptf notes (fst c))) 12)
-> 	pitch = 3 + div (lookuptf notes (fst c)) 12
+> 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookuptf notes (fst c1))) 12)
+> 	pitch = 3 + div (lookuptf notes (fst c1)) 12
+
 
 
 > twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToBasicChord twinkleChords) basic ionian) 
 > twinkleWithBoogieBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToBoogie twinkleChords) boogie ionian) 
-
+> twinkleWithCalypsoBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToCalypso twinkleChords) calypso ionian) 
 
 > splitToBasicChord :: [Chord] -> [Chord] 
 > splitToBasicChord [] = []
