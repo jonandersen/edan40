@@ -22,5 +22,3 @@ v2b = lmap (fd qn) [g 4,g 4,f 4,f 4,e 4,e 4]
 v2 = v2a :+: v2d :+: v2a :+: v2d
  
 twinkleMelody =  Instr "piano"$ Tempo 2 $ v1 :+: v2 :+: v1
-
-testSplitChordForReal = testSplitChord twinkleChords
