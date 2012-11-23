@@ -56,13 +56,13 @@ progression :: Key -> [Integer]
 
 Only basic atm
 
-autoBass bs key cp = basicPattern cp cl
+autoBass bs key cp = autoBass cp cl
 	
 
-> basicPattern :: [(PitchClass, Dur)] -> BassStyle -> Scale -> Music
-> basicPattern [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> basicPattern _ [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> basicPattern (c:cl) (b:bl) sc = foldr1 (:=:) (handleRest c b sc) :+: basicPattern cl bl sc
+> autoBass :: BassStyle -> Scale -> [(PitchClass, Dur)] -> Music
+> autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> autoBass _ [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> autoBass (b:bl) sc (c:cl) = foldr1 (:=:) (handleRest c b sc) :+: autoBass bl sc cl
 
 > handleRest c1 b1 sc1
 > 	|fst b1 == -1 = [Rest (snd b1)]
@@ -73,9 +73,9 @@ autoBass bs key cp = basicPattern cp cl
 
 
 
-> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToBasicChord twinkleChords) basic ionian) 
-> twinkleWithBoogieBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToBoogie twinkleChords) boogie ionian) 
-> twinkleWithCalypsoBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitToCalypso twinkleChords) calypso ionian) 
+> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ autoBass  basic ionian (splitToBasicChord twinkleChords)) 
+> twinkleWithBoogieBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ autoBass  boogie ionian (splitToBoogie twinkleChords)) 
+> twinkleWithCalypsoBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ autoBass  calypso ionian (splitToCalypso twinkleChords)) 
 
 > splitToBasicChord :: [Chord] -> [Chord] 
 > splitToBasicChord [] = []
@@ -179,8 +179,8 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 > testSplitWholeChord2 = splitToBasicChord [(C, hn)]
 > testSplitWholeChord3 = splitToBasicChord twinkleChords
 
-> testBasicPattern = basicPattern (splitToBasicChord twinkleChords)  basic ionian
-> testBoogiePattern = basicPattern (splitToBoogie twinkleChords)  boogie ionian
+> testBasicPattern = autoBass basic ionian (splitToBasicChord twinkleChords)
+> testBoogiePattern = autoBass boogie ionian (splitToBoogie twinkleChords)
 > testSplitToCalypso = splitToCalypso twinkleChords
 > testSplitToBoogie = splitToBoogie twinkleChords
 
