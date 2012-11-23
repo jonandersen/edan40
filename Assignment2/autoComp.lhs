@@ -12,7 +12,6 @@
 > type Chord = (PitchClass, Dur)
 > type ChordProgression = [Chord]
 > type Triad = [Int]
-> twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
 
 ///Tror att vi ska ha major i våran KEY så att den ser ut så här istället Key = (C, Major)/////
 
@@ -52,9 +51,10 @@ progression :: Key -> [Integer]
 ///BASS///
 
 > type BassStyle = [(Int, Dur)]
-> basic = cycle [(0,hn),(4,hn)]
-> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
-> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+
+--> basic = cycle [(0,hn),(4,hn)]
+--> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
+--> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
 
 Only basic atm
 
@@ -72,12 +72,6 @@ autoBass bs key cp = autoBass cp cl
 > 	where
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (lookupInt notes (fst c1)) 12
-
-
-
-> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ autoBass  basic ionian (splitToBasicChord twinkleChords)) 
-> twinkleWithBoogieBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ autoBass  boogie ionian (splitToBoogie twinkleChords)) 
-> twinkleWithCalypsoBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ autoBass  calypso ionian (splitToCalypso twinkleChords)) 
 
 > splitToBasicChord :: [Chord] -> [Chord] 
 > splitToBasicChord [] = []
@@ -156,50 +150,16 @@ autoComp creates a song with a baseline and chords.
 > autoComp cp key = Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))
 
 
-> twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
-
-twinkleBasic   = twinkleMelody :=: autoComp basic (C, Major) twinkleChords
-twinkleCalypso = twinkleMelody :=: autoComp calypso (C, Major) twinkleChords
-twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
-
-
-> v1a = lmap (fd qn) [c 4,c 4, g 4,g 4 ,a 4,a 4]
-> v1g = lmap vol [g 4 hn]
-> v1b = lmap (fd qn) [f 4 , f 4, e 4,e 4, d 4,d 4]
-> v1c = lmap vol [c 4 hn]
-> v1 = v1a :+: v1g :+: v1b :+: v1c
-
-> v2a = lmap (fd qn) [g 4,g 4,f 4,f 4,e 4,e 4]
-> v2d = lmap vol [d 4 hn]
-> v2b = lmap (fd qn) [g 4,g 4,f 4,f 4,e 4,e 4]
-> v2 = v2a :+: v2d :+: v2a :+: v2d
- 
-> twinkleMelody =  Instr "piano"$ Tempo 2 $ v1 :+: v2 :+: v1
-
-
-///TESTS///
-
-> testGetChord = (createChord F [0,4,7])
-> testGetChord2 = (createChord C [1])
-
-> testSplitWholeChord1 = splitToBasicChord [(C, wn)]
-> testSplitWholeChord2 = splitToBasicChord [(C, hn)]
-> testSplitWholeChord3 = splitToBasicChord twinkleChords
-
-> testBasicPattern = autoBass basic ionian (splitToBasicChord twinkleChords)
-> testBoogiePattern = autoBass boogie ionian (splitToBoogie twinkleChords)
-> testSplitToCalypso = splitToCalypso twinkleChords
-> testSplitToBoogie = splitToBoogie twinkleChords
-
 MIGHT COME IN HANDY
 
 > type Scale = [Int]
-> ionian = [0, 2, 4, 5, 7, 9, 11]
-> lydian = [0, 2, 4, 6, 7, 9, 11	]
-> mixolydian = [0, 2, 4, 5, 7, 9, 10]
-> aeolian = [0, 2, 3, 5, 7, 8, 10]
-> dorian = [0, 2, 3, 5, 7, 9, 10]
-> phrygian = [0, 1, 3, 5, 7, 8, 10]
+
+--> ionian = [0, 2, 4, 5, 7, 9, 11]
+--> lydian = [0, 2, 4, 6, 7, 9, 11	]
+--> mixolydian = [0, 2, 4, 5, 7, 9, 10]
+--> aeolian = [0, 2, 3, 5, 7, 8, 10]
+--> dorian = [0, 2, 3, 5, 7, 9, 10]
+--> phrygian = [0, 1, 3, 5, 7, 8, 10]
 
 Position		Major chord		Minor chord
 1						Ionian		
