@@ -67,16 +67,9 @@ autoBass bs key cp = basicPattern cp cl
 > 	note = (!!) notes  (mod (((!!) sc (fst b)) + (lookuptf notes (fst c))) 12)
 > 	pitch = 3 + div (lookuptf notes (fst c)) 12
 
-<<<<<<< HEAD
 
-		[PitchClass, INT]									INT
-(!!) notes  ((!!) sc (mod ((lookuptf notes (fst c) ) + fst b) 12))
---note = getSingleChord (fst c) (fst b)
+> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChords) basic ionian) 
 
-> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChordsMayBeBetter) basic ionian) 
-=======
-> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChords) basic) 
->>>>>>> b315223022b5463113d1691f38dd2b280180475c
 
 
 > splitWholeChord :: [Chord] -> [Chord] 
