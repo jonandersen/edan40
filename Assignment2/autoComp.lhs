@@ -4,6 +4,7 @@
 > module AutoComp where
 > import Haskore hiding (Key)
 > import Ratio 
+> import Maybe
 
 ///UTIL STUFF///
 
@@ -12,6 +13,7 @@
 > type Chord = (PitchClass, Dur)
 > type ChordProgression = [Chord]
 > type Triad = [Int]
+> type Scale = [Int]
 
 ///Tror att vi ska ha major i våran KEY så att den ser ut så här istället Key = (C, Major)/////
 
@@ -28,17 +30,17 @@
 
 Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
 
-> lookupNote :: [(PitchClass, Int)] -> Int -> PitchClass
-> lookupNote [] m = C
+> lookupNote :: [(PitchClass, Int)] -> Int -> Maybe PitchClass
+> lookupNote [] _ = Nothing
 > lookupNote ((t1,t2):ts) m
->		| m == t2 = t1
+>		| m == t2 = Just t1
 >		| otherwise = lookupNote ts m
 
 
-> lookupInt :: [(PitchClass, Int)] -> PitchClass -> Int
-> lookupInt [] m = 0
+> lookupInt :: [(PitchClass, Int)] -> PitchClass -> Maybe Int
+> lookupInt [] _ = Nothing
 > lookupInt ((t1,t2):ts) m
->		| m == t1 = t2
+>		| m == t1 = Just t2
 >		| otherwise = lookupInt ts m
 
 
@@ -70,34 +72,8 @@ autoBass bs key cp = autoBass cp cl
 > 	|fst b1 == -1 = [Rest (snd b1)]
 > 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 65]]
 > 	where
-> 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookupInt notes (fst c1))) 12)
-> 	pitch = 3 + div (lookupInt notes (fst c1)) 12
-
-> splitToBasicChord :: [Chord] -> [Chord] 
-> splitToBasicChord [] = []
-> splitToBasicChord (x:xs)
->		| snd x == wn = splitPair ++ splitToBasicChord xs
->		| otherwise  = x: splitToBasicChord xs
-> 	where
-> 	splitPair = [(fst x, hn), (fst x, hn)]
-
-> splitToCalypso :: [Chord] -> [Chord]
-> splitToCalypso [] = []
-> splitToCalypso (x:xs)
-> 	| snd x == wn = totalSplit ++ splitToCalypso xs
-> 	| snd x == hn = partialSplit ++ splitToCalypso xs
-> 	where
-> 	totalSplit = [(fst x, qn), (fst x, en),(fst x, en),(fst x, qn), (fst x, en),(fst x, en)]
-> 	partialSplit = [(fst x, qn),(fst x, en), (fst x, en)]
-
-> splitToBoogie :: [Chord] -> [Chord]
-> splitToBoogie [] = []
-> splitToBoogie (x:xs)
-> 	| snd x == wn = splitEight ++ splitToBoogie xs
-> 	| snd x == hn = splitQuarter ++ splitToBoogie xs
-> 	where
-> 	splitEight = [(fst x, en), (fst x, en),(fst x, en), (fst x, en),(fst x, en), (fst x, en),(fst x, en), (fst x, en)]
-> 	splitQuarter = [(fst x, en), (fst x, en),(fst x, en), (fst x, en)]
+> 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
+> 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
 
 Note (x, 4) (1%2) [Volume 60]
 13/12 = 1   3+notesPosition/12
@@ -112,14 +88,16 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 																					
 If C, [0,4,7] -> [C,E,G]
 
-> findNote rootNote position = lookupNote notes (mod ( (lookupInt notes rootNote) + position) 12)
+> findPitch rootNote position = fromJust $ lookupNote notes (mod ( (fromJust $ lookupInt notes rootNote) + position) 12)
 
-> noteList = take 15 $ drop 52 notes
+> noteList = take 16 $ drop 52 notes
 
 > createChord :: PitchClass -> Triad -> NoteList															
 > createChord _ [] = []											
-> createChord n (p:ps) = (findNote n p, div noteInt 12) :  createChord n ps
-> 	where noteInt = lookupInt noteList $ findNote n p
+> createChord n (p:ps) = (findPitch n p, div noteInt 12) :  createChord n ps
+> 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
+
+
 
 This maps some notes to a chord. 
 
@@ -147,11 +125,11 @@ AutoChord generates the chords of the song.
 autoComp creates a song with a baseline and chords.
 
 > autoComp :: ChordProgression -> Key -> Music
-> autoComp cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass calypso ionian $ splitToCalypso cp)
+> autoComp cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass calypso ionian cp)
 
 MIGHT COME IN HANDY
 
-> type Scale = [Int]
+
 
 > basic = cycle [(0,hn),(4,hn)]
 > calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
