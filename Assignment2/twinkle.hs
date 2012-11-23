@@ -1,9 +1,8 @@
-module Twinkle where
 import Haskore
 import AutoComp
 
 twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
-twinkleMusic = twinkleMelody :=: autoComp twinkleChords (C, Major)
+twinkleMusic = twinkleMelody :=: autoComp boogie twinkleChords (C, Major)
 
 -- twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
 --twinkleBasic   = twinkleMelody :=: autoComp basic (C, Major) twinkleChords
@@ -24,3 +23,4 @@ v2 = v2a :+: v2d :+: v2a :+: v2d
  
 twinkleMelody =  Instr "piano"$ Tempo 2 $ v1 :+: v2 :+: v1
 
+testSplitChordForReal = testSplitChord twinkleChords

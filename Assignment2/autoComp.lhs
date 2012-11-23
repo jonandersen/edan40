@@ -26,8 +26,6 @@
 > v      = [Volume 100]
 > lmap f l = line (map f l)
 
-Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
-
 > lookupNote :: [(PitchClass, Int)] -> Int -> PitchClass
 > lookupNote [] m = C
 > lookupNote ((t1,t2):ts) m
@@ -46,20 +44,9 @@ Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor det
 
 Our model for chords, can be expanded
 
-progression :: Key -> [Integer]
-
 ///BASS///
 
 > type BassStyle = [(Int, Dur)]
-
---> basic = cycle [(0,hn),(4,hn)]
---> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
---> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
-
-Only basic atm
-
-autoBass bs key cp = autoBass cp cl
-	
 
 > autoBass :: BassStyle -> Scale -> [(PitchClass, Dur)] -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
@@ -73,35 +60,14 @@ autoBass bs key cp = autoBass cp cl
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (lookupInt notes (fst c1)) 12
 
-> splitToBasicChord :: [Chord] -> [Chord] 
-> splitToBasicChord [] = []
-> splitToBasicChord (x:xs)
->		| snd x == wn = splitPair ++ splitToBasicChord xs
->		| otherwise  = x: splitToBasicChord xs
-> 	where
-> 	splitPair = [(fst x, hn), (fst x, hn)]
+> testSplitChord = splitChord calypso
 
-> splitToCalypso :: [Chord] -> [Chord]
-> splitToCalypso [] = []
-> splitToCalypso (x:xs)
-> 	| snd x == wn = totalSplit ++ splitToCalypso xs
-> 	| snd x == hn = partialSplit ++ splitToCalypso xs
-> 	where
-> 	totalSplit = [(fst x, qn), (fst x, en),(fst x, en),(fst x, qn), (fst x, en),(fst x, en)]
-> 	partialSplit = [(fst x, qn),(fst x, en), (fst x, en)]
-
-> splitToBoogie :: [Chord] -> [Chord]
-> splitToBoogie [] = []
-> splitToBoogie (x:xs)
-> 	| snd x == wn = splitEight ++ splitToBoogie xs
-> 	| snd x == hn = splitQuarter ++ splitToBoogie xs
-> 	where
-> 	splitEight = [(fst x, en), (fst x, en),(fst x, en), (fst x, en),(fst x, en), (fst x, en),(fst x, en), (fst x, en)]
-> 	splitQuarter = [(fst x, en), (fst x, en),(fst x, en), (fst x, en)]
-
-Note (x, 4) (1%2) [Volume 60]
-13/12 = 1   3+notesPosition/12
-b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
+> splitChord :: BassStyle -> [(PitchClass, Dur)] -> [(PitchClass, Dur)] 
+> splitChord [] _ = []
+> splitChord _ [] = []
+> splitChord (b:bl) (c:cl)
+> 	| snd c > snd b = splitChord (b:bl) ([(fst c, (snd c)/2), (fst c, (snd c)/2)] ++ cl)
+> 	| otherwise =   c: splitChord bl cl
 
 ///CHORDS///
 
@@ -146,13 +112,14 @@ AutoChord generates the chords of the song.
 
 autoComp creates a song with a baseline and chords.
 
-> autoComp :: ChordProgression -> Key -> Music
-> autoComp cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass calypso ionian $ splitToCalypso cp)
+> autoComp :: BassStyle -> ChordProgression -> Key -> Music
+> autoComp bs cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass bs ionian $ splitChord bs cp)
 
 MIGHT COME IN HANDY
 
 > type Scale = [Int]
 
+> basic, calypso, boogie :: BassStyle
 > basic = cycle [(0,hn),(4,hn)]
 > calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
 > boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
