@@ -120,9 +120,6 @@ If C, [0,4,7] -> [C,E,G]
 > createChord _ [] = []											
 > createChord n (p:ps) = (lookupts notes (mod ((lookuptf notes n) + p) 12 )) : createChord n ps
 
-> getSingleChord :: PitchClass -> Int -> PitchClass
-> getSingleChord n p = (lookupts notes (mod ((lookuptf notes n) + p) 12 ))
-
 This maps some notes to a chord. 
 
 > mapChord :: NoteList -> Dur -> Music
