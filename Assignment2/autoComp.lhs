@@ -88,14 +88,15 @@ If C, [0,4,7] -> [C,E,G]
 
 > createFirstChord :: PitchClass -> Triad -> NoteList			
 > createFirstChord _ [] = []
-> createFirstChord n (p:ps) = (findPitch n p, div noteInt 12) :  createFirstChord n ps
-> 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
+> createFirstChord n (p:ps) = (pitch, div noteInt 12) :  createFirstChord n ps
+> 	where noteInt = fromJust $ lookupInt noteList $ pitch
+>         pitch = findPitch n p
 
 > createChord :: NoteList -> PitchClass -> Triad -> NoteList															
 > createChord _ _ [] = []											
-> createChord prev n (p:ps) = (findPitch n p, div noteInt 12) :  createChord prev n ps
-> 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
-
+> createChord prev n (p:ps) = (pitch, div noteInt 12) :  createChord prev n ps
+>    where noteInt = findClosets p pitch 
+>          pitch = findPitch n p
 
 > findClosets :: Int -> PitchClass -> Int
 > findClosets n p  
@@ -129,7 +130,8 @@ AutoChord generates the chords of the song.
 
 > createChords :: Key -> ChordProgression -> NoteList -> [Music] 
 > createChords _ [] _ = []																
-> createChords rootKey ((note,dur):keys) previous = (mapChord (createChord previous note $ findTriad rootKey note) dur) : createChords rootKey keys	previous																	
+> createChords rootKey ((note,dur):keys) previous = (mapChord current dur) : createChords rootKey keys current
+>    where current = (createChord previous note $ findTriad rootKey note)																
 																					
 
 > autoChord :: Key -> ChordProgression -> [Music] 
