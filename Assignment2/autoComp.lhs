@@ -63,12 +63,12 @@ autoBass bs key cp = autoBass cp cl
 
 > autoBass :: BassStyle -> Scale -> [(PitchClass, Dur)] -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> autoBass _ [] _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
+> autoBass _ _ [] = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
 > autoBass (b:bl) sc (c:cl) = foldr1 (:=:) (handleRest c b sc) :+: autoBass bl sc cl
 
 > handleRest c1 b1 sc1
 > 	|fst b1 == -1 = [Rest (snd b1)]
-> 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 80]]
+> 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 65]]
 > 	where
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (lookupInt notes (fst c1)) 12
@@ -147,26 +147,20 @@ AutoChord generates the chords of the song.
 autoComp creates a song with a baseline and chords.
 
 > autoComp :: ChordProgression -> Key -> Music
-> autoComp cp key = Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))
+> autoComp cp key = (Tempo 2 $ autoBass calypso ionian cp)
 
 
 MIGHT COME IN HANDY
 
 > type Scale = [Int]
 
---> ionian = [0, 2, 4, 5, 7, 9, 11]
---> lydian = [0, 2, 4, 6, 7, 9, 11	]
---> mixolydian = [0, 2, 4, 5, 7, 9, 10]
---> aeolian = [0, 2, 3, 5, 7, 8, 10]
---> dorian = [0, 2, 3, 5, 7, 9, 10]
---> phrygian = [0, 1, 3, 5, 7, 8, 10]
-
-Position		Major chord		Minor chord
-1						Ionian		
-2						Mixolydian		Dorian
-3													Phrygian
-4						Lydian		
-5						Mixolydian		
-6													Aeolian
-7
+> basic = cycle [(0,hn),(4,hn)]
+> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
+> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+> ionian = [0, 2, 4, 5, 7, 9, 11]
+> lydian = [0, 2, 4, 6, 7, 9, 11	]
+> mixolydian = [0, 2, 4, 5, 7, 9, 10]
+> aeolian = [0, 2, 3, 5, 7, 8, 10]
+> dorian = [0, 2, 3, 5, 7, 9, 10]
+> phrygian = [0, 1, 3, 5, 7, 8, 10]
 
