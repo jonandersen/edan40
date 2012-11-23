@@ -29,19 +29,21 @@
 
 Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
 
-> lookupts :: [(PitchClass, Int)] -> Int -> PitchClass
-> lookupts ((t1,t2):ts) m
+> lookupNote :: [(PitchClass, Int)] -> Int -> PitchClass
+> lookupNote [] m = C
+> lookupNote ((t1,t2):ts) m
 >		| m == t2 = t1
->		| otherwise = lookupts ts m
+>		| otherwise = lookupNote ts m
 
 
-> lookuptf :: [(PitchClass, Int)] -> PitchClass -> Int
-> lookuptf ((t1,t2):ts) m
+> lookupInt :: [(PitchClass, Int)] -> PitchClass -> Int
+> lookupInt [] m = 0
+> lookupInt ((t1,t2):ts) m
 >		| m == t1 = t2
->		| otherwise = lookuptf ts m
+>		| otherwise = lookupInt ts m
 
 
-> notes = zip [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B][0,1..]
+> notes = zip (cycle [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B]) [0,1..]
 
 Our model for chords, can be expanded
 
@@ -68,8 +70,8 @@ autoBass bs key cp = autoBass cp cl
 > 	|fst b1 == -1 = [Rest (snd b1)]
 > 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 80]]
 > 	where
-> 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookuptf notes (fst c1))) 12)
-> 	pitch = 3 + div (lookuptf notes (fst c1)) 12
+> 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (lookupInt notes (fst c1))) 12)
+> 	pitch = 3 + div (lookupInt notes (fst c1)) 12
 
 
 
@@ -116,9 +118,14 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 																					
 If C, [0,4,7] -> [C,E,G]
 
+> findNote rootNote position = lookupNote notes (mod ( (lookupInt notes rootNote) + position) 12)
+
+> noteList = take 12 $ drop 52 notes
+
 > createChord :: PitchClass -> Triad -> NoteList															
 > createChord _ [] = []											
-> createChord n (p:ps) = ((lookupts notes (mod ((lookuptf notes n) + p) 12 )), 4) : createChord n ps
+> createChord n (p:ps) = (findNote n p, div noteInt 12) :  createChord n ps
+> 	where noteInt = lookupInt noteList $ findNote n p
 
 This maps some notes to a chord. 
 
