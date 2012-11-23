@@ -10,10 +10,9 @@
 > type Key = (PitchClass, Mode)
 > type NoteList = [PitchClass]
 > type Chord = (PitchClass, Dur)
-> type ChordProgression = [(Key, Dur)]
+> type ChordProgression = [Chord]
 > type Triad = [Int]
-> twinkleChords = [(cmaj, wn) ,(fmaj , hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, wn), (fmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn), (gmaj, hn), (cmaj, hn)]
-> twinkleChordsMayBeBetter = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
+> twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
 
 ///Tror att vi ska ha major i våran KEY så att den ser ut så här istället Key = (C, Major)/////
 
@@ -42,7 +41,7 @@ Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor det
 >		| otherwise = lookuptf ts m
 
 
-> notes = [(C, 0),(Cs, 1), (D, 2),(Ds, 3),(E, 4), (F, 5),(Fs, 6),(G, 7),(Gs, 8),(A, 9), (As, 10), (B, 11) ]
+> notes = zip [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B][0,1..]
 
 Our model for chords, can be expanded
 
@@ -68,12 +67,16 @@ autoBass bs key cp = basicPattern cp cl
 > 	note = (!!) notes  (mod (((!!) sc (fst b)) + (lookuptf notes (fst c))) 12)
 > 	pitch = 3 + div (lookuptf notes (fst c)) 12
 
+<<<<<<< HEAD
 
 		[PitchClass, INT]									INT
 (!!) notes  ((!!) sc (mod ((lookuptf notes (fst c) ) + fst b) 12))
 --note = getSingleChord (fst c) (fst b)
 
 > twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChordsMayBeBetter) basic ionian) 
+=======
+> twinkleWithBasicBass = twinkleMelody :=: (Instr "piano" $ Tempo 2 $ basicPattern (splitWholeChord twinkleChords) basic) 
+>>>>>>> b315223022b5463113d1691f38dd2b280180475c
 
 
 > splitWholeChord :: [Chord] -> [Chord] 
@@ -91,8 +94,8 @@ b1a = lmap (fd hn) [c  3, g 3, f  3, g 3]
 
 ///CHORDS///
 
-> findTriad :: Key -> Key -> Triad
-> findTriad rootKey (note, mode)
+> findTriad :: Key -> PitchClass -> Triad
+> findTriad (key, mode) note
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
 																					
@@ -125,7 +128,7 @@ AutoChord generates the chords of the song.
 
 > autoChord :: Key -> ChordProgression -> [Music]
 > autoChord _ [] = [] 
-> autoChord rootKey ((key,dur):keys) = (mapChord (createChord (fst key) $ findTriad rootKey $ key) dur) : autoChord rootKey keys
+> autoChord rootKey ((note,dur):keys) = (mapChord (createChord note $ findTriad rootKey note) dur) : autoChord rootKey keys
 
 
 autoComp creates a song with a baseline and chords.
@@ -162,9 +165,9 @@ twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
 
 > testSplitWholeChord1 = splitWholeChord [(C, wn)]
 > testSplitWholeChord2 = splitWholeChord [(C, hn)]
-> testSplitWholeChord3 = splitWholeChord twinkleChordsMayBeBetter
+> testSplitWholeChord3 = splitWholeChord twinkleChords
 
-> testBasicPattern = basicPattern (splitWholeChord twinkleChordsMayBeBetter)  basic
+> testBasicPattern = basicPattern (splitWholeChord twinkleChords)  basic
 
 
 MIGHT COME IN HANDY
