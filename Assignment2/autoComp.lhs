@@ -120,7 +120,7 @@ If C, [0,4,7] -> [C,E,G]
 
 > findNote rootNote position = lookupNote notes (mod ( (lookupInt notes rootNote) + position) 12)
 
-> noteList = take 12 $ drop 52 notes
+> noteList = take 15 $ drop 52 notes
 
 > createChord :: PitchClass -> Triad -> NoteList															
 > createChord _ [] = []											
