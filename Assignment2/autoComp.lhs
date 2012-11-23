@@ -92,10 +92,26 @@ If C, [0,4,7] -> [C,E,G]
 
 > noteList = take 16 $ drop 52 notes
 
-> createChord :: PitchClass -> Triad -> NoteList															
-> createChord _ [] = []											
-> createChord n (p:ps) = (findPitch n p, div noteInt 12) :  createChord n ps
+> createFirstChord :: PitchClass -> Triad -> NoteList			
+> createFirstChord _ [] = []
+> createFirstChord n (p:ps) = (findPitch n p, div noteInt 12) :  createFirstChord n ps
 > 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
+
+> createChord :: NoteList -> PitchClass -> Triad -> NoteList															
+> createChord _ _ [] = []											
+> createChord prev n (p:ps) = (findPitch n p, div noteInt 12) :  createChord prev n ps
+> 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
+
+
+> findClosets :: Int -> PitchClass -> Int
+> findClosets n p  
+>    | abs(n - normal) <= abs(n - reversed) = normal
+>    | otherwise     												= reversed 
+>    where normal = (fromJust $ lookupInt noteList p)
+>          reversed = (fromJust $ lookupInt (reverse noteList) p)  
+
+
+> testFindClosets = findClosets 55 G 
 
 
 
@@ -117,9 +133,14 @@ AutoChord generates the chords of the song.
 
 																					Needs to be updated
 
-> autoChord :: Key -> ChordProgression -> [Music]
-> autoChord _ [] = [] 
-> autoChord rootKey ((note,dur):keys) = (mapChord (createChord note $ findTriad rootKey note) dur) : autoChord rootKey keys
+> createChords :: Key -> ChordProgression -> NoteList -> [Music] 
+> createChords _ [] _ = []																
+> createChords rootKey ((note,dur):keys) previous = (mapChord (createChord previous note $ findTriad rootKey note) dur) : createChords rootKey keys	previous																	
+																					
+
+> autoChord :: Key -> ChordProgression -> [Music] 
+> autoChord rootKey cp = createChords rootKey cp headChord
+>    where headChord = (createFirstChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 
 autoComp creates a song with a baseline and chords.
