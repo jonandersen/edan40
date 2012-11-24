@@ -195,6 +195,9 @@ Assumption made is (E:4 -> G:5)
 > 	| otherwise = curr : makeCloser prevs currs
 > 	where new = curr + 12
 
+> makeTigther :: Triad -> Triad
+> makeTigther triad = triad
+
 This maps some notes to a chord. 
 
 > mapChord :: NoteList -> Dur -> Music
@@ -209,12 +212,12 @@ AutoChord generates the chords of the song.
 > createChords :: Key -> ChordProgression -> Triad -> [Music] 
 > createChords _ [] _ = []																
 > createChords rootKey ((note,dur):keys) previous = (mapChord (convertToNote current) dur) : createChords rootKey keys current
->    where current = makeCloser previous $ createChord note $ findTriad rootKey note															
+>    where current = makeTigther $ makeCloser previous $ createChord note $ findTriad rootKey note															
 																					
 
 > autoChord :: Key -> ChordProgression -> [Music] 
 > autoChord rootKey cp = createChords rootKey cp headChord
->    where headChord = (createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
+>    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 
 autoComp creates a song with a baseline and chords.
