@@ -171,60 +171,29 @@ Our main goal in this section is to implement the autoBass function and to do th
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
 																					
-If C, [0,4,7] -> [C,E,G]
+> convertToNote :: Triad -> NoteList
+> convertToNote [] = []
+> convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
 
-> findPitch rootNote position = fromJust $ lookupNote notes (mod ( (fromJust $ lookupInt notes rootNote) + position) 12)
+> findPitchInt :: NoteList -> PitchClass -> Int
+> findPitchInt n pitchClass = (fromJust $ lookupInt n pitchClass)
 
-> findPitchInt pitch = ((fromJust $ lookupInt notes (fst pitch)) + (snd pitch) * 12)
+> findPitch :: NoteList -> Int -> PitchClass
+> findPitch n int = (fromJust $ lookupNote n int)
 
-> noteList = take 16 $ drop 52 notes
+> noteList = take 13 $ drop 52 notes
 
-> createFirstChord :: PitchClass -> Triad -> NoteList			
-> createFirstChord _ [] = []
-> createFirstChord n (p:ps) = (findPitch n p, div noteInt 12) :  createFirstChord n ps
-> 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
+> createChord :: PitchClass -> Triad -> Triad		
+> createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
 
-> createChord :: NoteList -> PitchClass -> Triad -> NoteList															
-> createChord _ _ [] = []											
-> createChord (prev:prevs) n (p:ps) = (pitch, div noteInt 12) :  createChord prevs n ps
->    where noteInt = findClosets (findPitchInt prev) pitch
->          pitch = findPitch n p
+Assumption made is (E:4 -> G:5)
 
-> findClosets :: Int -> PitchClass -> Int
-> findClosets n p  
->    | abs(n - normal) <= abs(n - reversed) = normal
->    | otherwise     												= reversed 
->    where normal = (fromJust $ lookupInt noteList p)
->          reversed = (fromJust $ lookupInt (reverse noteList) p)  
-
-> sumOfChord :: NoteList -> Int
-> sumOfChord chords =  abs $ foldl1 (-) $ zipWith (*) (snd $ unzip chords) (map (fromJust) $ map (lookupInt notes ) $ fst $ unzip chords)
-
-
-> findTightest :: NoteList -> NoteList
-> findTightest [] = []
-> findTightest (x:xs) 
->    | summed  > summedNew = x:findTightest xs
->    | otherwise = x:findTightest xs
->    where summed = sumOfChord (x:xs)
->          summedNew = sumOfChord (x:xs) 
-
-
-> testFindClosets = findClosets 55 G 
-
-> testCreateChord = createChord [(C,5),(E,4),(G,4)] G [0,4,7] 
-> testCreateChord2 = createChord [(F,4),(A,4),(C,5)] F [0,4,7] 
-> ensureCreateChord = [(G,4),(B,4),(D,4)]
-
-testChords :: NoteList
-testChords = [(C,4),(D,4)(E,4)]
-
-[(E,4),(G,4),(C,5)]
-
-[(E,4),(C,5),(G,5)]
-
- testSumOfChord = sumOfChord 
-
+> makeCloser :: Triad -> Triad -> Triad 
+> makeCloser [] [] = []
+> makeCloser (prev:prevs) (curr:currs) 
+> 	| elem new (take 13 $ drop 52 [0,1..]) && abs (new - prev) < abs (curr - prev) = new : makeCloser prevs currs
+> 	| otherwise = curr : makeCloser prevs currs
+> 	where new = curr + 12
 
 This maps some notes to a chord. 
 
@@ -237,15 +206,15 @@ AutoChord generates the chords of the song.
 
 																					Needs to be updated
 
-> createChords :: Key -> ChordProgression -> NoteList -> [Music] 
+> createChords :: Key -> ChordProgression -> Triad -> [Music] 
 > createChords _ [] _ = []																
-> createChords rootKey ((note,dur):keys) previous = (mapChord current dur) : createChords rootKey keys current
->    where current = findTightest (createChord previous note $ findTriad rootKey note)																
+> createChords rootKey ((note,dur):keys) previous = (mapChord (convertToNote current) dur) : createChords rootKey keys current
+>    where current = makeCloser previous $ createChord note $ findTriad rootKey note															
 																					
 
 > autoChord :: Key -> ChordProgression -> [Music] 
 > autoChord rootKey cp = createChords rootKey cp headChord
->    where headChord = (createFirstChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
+>    where headChord = (createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 
 autoComp creates a song with a baseline and chords.
