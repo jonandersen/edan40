@@ -88,9 +88,8 @@ If C, [0,4,7] -> [C,E,G]
 
 > createFirstChord :: PitchClass -> Triad -> NoteList			
 > createFirstChord _ [] = []
-> createFirstChord n (p:ps) = (pitch, div noteInt 12) :  createFirstChord n ps
-> 	where noteInt = fromJust $ lookupInt noteList $ pitch
->         pitch = findPitch n p
+> createFirstChord n (p:ps) = (findPitch n p, div noteInt 12) :  createFirstChord n ps
+> 	where noteInt = fromJust $ lookupInt noteList $ findPitch n p
 
 > createChord :: NoteList -> PitchClass -> Triad -> NoteList															
 > createChord _ _ [] = []											
@@ -105,8 +104,20 @@ If C, [0,4,7] -> [C,E,G]
 >    where normal = (fromJust $ lookupInt noteList p)
 >          reversed = (fromJust $ lookupInt (reverse noteList) p)  
 
+> sumOfChord :: NoteList -> Int
+> sumOfChord chords =  sum $ zipWith (*) (snd $ unzip chords) (map (fromJust) $ map (lookupInt notes ) $ fst $ unzip chords)
+
+> findTightest :: NoteList -> NoteList
+> findTightest [] = []
+> findTightest (x:xs) = xs
+
 
 > testFindClosets = findClosets 55 G 
+
+testChords :: NoteList
+testChords = [(C,4),(D,4)(E,4)]
+
+ testSumOfChord = sumOfChord 
 
 
 
