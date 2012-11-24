@@ -73,7 +73,7 @@ Our model for chords, can be expanded
 > 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 65]]
 > 	where
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
-> 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
+> 	pitch = 2 + div (fromJust $ lookupInt notes (fst c1)) 12
 
 
 > splitChord :: BassStyle -> [(PitchClass, Dur)] -> [(PitchClass, Dur)] 
@@ -94,6 +94,8 @@ If C, [0,4,7] -> [C,E,G]
 
 > findPitch rootNote position = fromJust $ lookupNote notes (mod ( (fromJust $ lookupInt notes rootNote) + position) 12)
 
+> findPitchInt pitch = ((fromJust $ lookupInt notes (fst pitch)) + (snd pitch) * 12)
+
 > noteList = take 16 $ drop 52 notes
 
 > createFirstChord :: PitchClass -> Triad -> NoteList			
@@ -103,8 +105,8 @@ If C, [0,4,7] -> [C,E,G]
 
 > createChord :: NoteList -> PitchClass -> Triad -> NoteList															
 > createChord _ _ [] = []											
-> createChord prev n (p:ps) = (pitch, div noteInt 12) :  createChord prev n ps
->    where noteInt = findClosets p pitch 
+> createChord (prev:prevs) n (p:ps) = (pitch, div noteInt 12) :  createChord prevs n ps
+>    where noteInt = findClosets (findPitchInt prev) pitch
 >          pitch = findPitch n p
 
 > findClosets :: Int -> PitchClass -> Int
@@ -128,6 +130,10 @@ If C, [0,4,7] -> [C,E,G]
 
 
 > testFindClosets = findClosets 55 G 
+
+> testCreateChord = createChord [(C,5),(E,4),(G,4)] G [0,4,7] 
+> testCreateChord2 = createChord [(F,4),(A,4),(C,5)] F [0,4,7] 
+> ensureCreateChord = [(G,4),(B,4),(D,4)]
 
 testChords :: NoteList
 testChords = [(C,4),(D,4)(E,4)]

@@ -4,7 +4,7 @@ import AutoComp
 rep x 0 = []
 rep x n= x ++ rep x (n-1)
 
-song = lmap vol [b 3 qn, d 4 qn, d 4 en, e 4 en, e 4 qn, g 4 sn, fs 4 sn,g 4 sn, fs 4 sn, g 4 sn, fs 4 sn, d 4 en, d 4 en, e 4 en, e 4 qn]
+song = lmap vol [b 2 qn, d 3 qn, d 3 en, e 3 en, e 3 qn, g 3 sn, fs 3 sn,g 3 sn, fs 3 sn, g 3 sn, fs 3 sn, d 3 en, d 3 en, e 3 en, e 3 qn]
 rest = enr
 voice = times 3 (song :+: rest)
 
