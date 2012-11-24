@@ -195,8 +195,20 @@ Assumption made is (E:4 -> G:5)
 > 	| otherwise = curr : makeCloser prevs currs
 > 	where new = curr + 12
 
+> tryToTighten :: Int -> Int
+> tryToTighten t 
+> 	| elem (t + 12) (take 13 $ drop 52 [0,1..]) = t + 12
+> 	| elem (t - 12) (take 13 $ drop 52 [0,1..]) = t - 12
+> 	| otherwise = t
+
+> sumOfTriad :: Triad -> Int
+> sumOfTriad triad = abs $ foldl1 (-) triad
+
 > makeTigther :: Triad -> Triad
-> makeTigther triad = triad
+> makeTigther [] = []
+> makeTigther (t:ts) 
+> 	| (sumOfTriad $ (tryToTighten t):ts) < (sumOfTriad (t:ts)) = (tryToTighten t):makeTigther ts
+> 	| otherwise = t:makeTigther ts
 
 This maps some notes to a chord. 
 
