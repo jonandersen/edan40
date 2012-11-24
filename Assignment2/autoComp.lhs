@@ -1,6 +1,13 @@
 \section{Haskore CSound Tutorial}
 \label{csound-tut}
 
+EDAN40 - Functional Music
+Jon Andersen ada08jan@student.lu.se 
+Marcus Carlberg ada08mca@student.lu.se
+
+Introduction
+
+
 > module AutoComp where
 > import Haskore hiding (Key)
 > import Ratio 
@@ -29,6 +36,8 @@
 > v      = [Volume 100]
 > lmap f l = line (map f l)
 
+> times  1    m = m
+> times (n+1) m = m :+: (times n m)
 
 Dessa tva borde vi kunna gora battre, eller hitta en fardig funktion som gor detta?
 

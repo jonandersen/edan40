@@ -5,9 +5,9 @@ twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn),
 twinkleMusic = twinkleMelody :=: autoComp boogie twinkleChords (C, Major)
 
 -- twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
---twinkleBasic   = twinkleMelody :=: autoComp basic (C, Major) twinkleChords
---twinkleCalypso = twinkleMelody :=: autoComp calypso (C, Major) twinkleChords
---twinkleBoogie  = twinkleMelody :=: autoComp boogie (C, Major) twinkleChords
+twinkleBasic   = twinkleMelody :=: autoComp basic  twinkleChords (C, Major)
+twinkleCalypso = twinkleMelody :=: autoComp calypso  twinkleChords (C, Major)
+twinkleBoogie  = twinkleMelody :=: autoComp boogie twinkleChords (C, Major) 
 
 
 v1a = lmap (fd qn) [c 4,c 4, g 4,g 4 ,a 4,a 4]
