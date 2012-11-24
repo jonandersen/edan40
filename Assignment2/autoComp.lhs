@@ -109,18 +109,13 @@ If C, [0,4,7] -> [C,E,G]
 > sumOfChord chords =  sum $ zipWith (*) (snd $ unzip chords) (map (fromJust) $ map (lookupInt notes ) $ fst $ unzip chords)
 
 
-
-> reversedNote :: Note -> Note
-> reversedNote (pitch,octave) = (pitch,octave)
-
-
 > findTightest :: NoteList -> NoteList
 > findTightest [] = []
 > findTightest (x:xs) 
 >    | summed  > summedNew = x:findTightest xs
 >    | otherwise = x:findTightest xs
 >    where summed = sumOfChord (x:xs)
->          summedNew = sumOfChord ((reversedNote x):xs) 
+>          summedNew = sumOfChord (x:xs) 
 
 
 > testFindClosets = findClosets 55 G 
