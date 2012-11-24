@@ -215,8 +215,8 @@ AutoChord generates the chords of the song.
 >    where current = makeTigther $ makeCloser previous $ createChord note $ findTriad rootKey note															
 																					
 
-> autoChord :: Key -> ChordProgression -> [Music] 
-> autoChord rootKey cp = createChords rootKey cp headChord
+> autoChord :: Key -> ChordProgression -> Music
+> autoChord rootKey cp = Instr "piano" $ Tempo 2 $ foldr1 (:+:) $ createChords rootKey cp headChord
 >    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 
@@ -224,7 +224,7 @@ autoComp creates a song with a baseline and chords.
 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
-> autoComp bs cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass bs key $ splitChord bs cp)
+> autoComp bs cp key =  (autoChord key cp) :=: (Tempo 2 $ autoBass bs key $ splitChord bs cp)
 
 
 
