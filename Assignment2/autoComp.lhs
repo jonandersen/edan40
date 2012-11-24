@@ -115,7 +115,7 @@ If C, [0,4,7] -> [C,E,G]
 >          reversed = (fromJust $ lookupInt (reverse noteList) p)  
 
 > sumOfChord :: NoteList -> Int
-> sumOfChord chords =  abs $ foldr1 (-) $ zipWith (*) (snd $ unzip chords) (map (fromJust) $ map (lookupInt notes ) $ fst $ unzip chords)
+> sumOfChord chords =  abs $ foldl1 (-) $ zipWith (*) (snd $ unzip chords) (map (fromJust) $ map (lookupInt notes ) $ fst $ unzip chords)
 
 
 > findTightest :: NoteList -> NoteList
