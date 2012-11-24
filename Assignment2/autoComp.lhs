@@ -16,21 +16,46 @@ a 3 different types of bass lines and chords to a song.
 
 ///UTIL STUFF///
 
-To make everything work different defenitions had to be made for the different 
+To make everything work defenitions had to be made for the different musical terms.
+The first thing we need to define is the Pitchclass. This attribute decides whitch tone 
+a Note belongs to and there are 21 different PitchClasses defined in Haskore. 
+All tones circulates in the frequency domain. When you double the frequency
+you get the same tone again but in a brighter sound. This fenomenom is called that we have 
+raised the note one Octave. 
+
+There is a huge overlap in Notes and to cover all possible notes we only need to define 12 notes in 
+a list called a NoteList. A common way to find notes that sound good when used together is to use
+predefined scales. A Scale in this program is a list of Int's where every entry in the list correspond 
+to a good choise of Notes from our NoteList.
+
+Example: We have our notelist consisting of [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B] and we want to create a song 
+in ionian scale defined as follow [0, 2, 4, 5, 7, 9, 11]. Following this scale we would get the notes 
+[C,D,E,F,G,A,B] to use in our song.
+
+A Triad is a way to use our scales to create a Chord. In this program we consentrate on Chords consisting 
+of 3 Notes only therefor the name Triad.  
 
 
-> type Key = (PitchClass, Mode)
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
+> type Scale = [Int]
+> type Triad = [Int]
+> type Key = (PitchClass, Mode)
 > type Chord = (PitchClass, Dur)
 > type ChordProgression = [Chord]
-> type Triad = [Int]
-> type Scale = [Int]
+
 
 
 > cmaj = (C, Major)
 > fmaj = (F, Major)
 > gmaj = (G, Major)
+
+> ionian = [0, 2, 4, 5, 7, 9, 11]
+> lydian = [0, 2, 4, 6, 7, 9, 11	]
+> mixolydian = [0, 2, 4, 5, 7, 9, 10]
+> aeolian = [0, 2, 3, 5, 7, 8, 10]
+> dorian = [0, 2, 3, 5, 7, 9, 10]
+> phrygian = [0, 1, 3, 5, 7, 8, 10]
 
 
 > fd d n = n d v
@@ -205,10 +230,5 @@ MIGHT COME IN HANDY
 
 
 
-> ionian = [0, 2, 4, 5, 7, 9, 11]
-> lydian = [0, 2, 4, 6, 7, 9, 11	]
-> mixolydian = [0, 2, 4, 5, 7, 9, 10]
-> aeolian = [0, 2, 3, 5, 7, 8, 10]
-> dorian = [0, 2, 3, 5, 7, 9, 10]
-> phrygian = [0, 1, 3, 5, 7, 8, 10]
+
 
