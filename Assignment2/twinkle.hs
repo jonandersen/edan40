@@ -3,7 +3,7 @@ import AutoComp
 
 twinkleChords = [(C, wn) ,(F , hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, wn), (F, hn), (C, hn), (G, hn), (C, hn), (G, hn), (C, hn)]
 twinkleMusic = twinkleMelody :=: autoComp boogie twinkleChords (C, Major)
-
+teinkleChordTest = autoChord (C,Major) twinkleChords
 -- twinkleWithChords = twinkleMelody :=: autoComp twinkleChords cmaj 
 twinkleBasic   = twinkleMelody :=: autoComp basic  twinkleChords (C, Major)
 twinkleCalypso = twinkleMelody :=: autoComp calypso  twinkleChords (C, Major)

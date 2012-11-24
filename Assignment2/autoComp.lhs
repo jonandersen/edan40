@@ -6,7 +6,8 @@ Jon Andersen ada08jan@student.lu.se
 Marcus Carlberg ada08mca@student.lu.se
 
 Introduction
-
+AutomComp is a program that given a list of Chords and a Key of a song can generate 
+a 3 different types of bass lines and chords to a song. 
 
 > module AutoComp where
 > import Haskore hiding (Key)
@@ -15,6 +16,9 @@ Introduction
 
 ///UTIL STUFF///
 
+To make everything work different defenitions had to be made for the different 
+
+
 > type Key = (PitchClass, Mode)
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
@@ -22,8 +26,6 @@ Introduction
 > type ChordProgression = [Chord]
 > type Triad = [Int]
 > type Scale = [Int]
-
-///Tror att vi ska ha major i våran KEY så att den ser ut så här istället Key = (C, Major)/////
 
 
 > cmaj = (C, Major)
@@ -63,10 +65,25 @@ Our model for chords, can be expanded
 
 > type BassStyle = [(Int, Dur)]
 
-> autoBass :: BassStyle -> Scale -> [(PitchClass, Dur)] -> Music
+> basic, calypso, boogie :: BassStyle
+> basic = cycle [(0,hn),(4,hn)]
+> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
+> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+
+
+> autoBass :: BassStyle -> Key -> [(PitchClass, Dur)] -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
 > autoBass _ _ [] = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> autoBass (b:bl) sc (c:cl) = foldr1 (:=:) (handleRest c b sc) :+: autoBass bl sc cl
+> autoBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
+
+> getScale :: Key -> Chord ->[Int]
+> getScale k c
+> 	| snd k == Major = ionian
+>  	| otherwise = isDorian k c
+> 	where
+> 	isDorian k c
+> 		| (fromJust $ lookupInt notes (fst c)) == ((fromJust $ lookupInt notes (fst k)) + 3) = dorian
+> 		| otherwise = aeolian
 
 > handleRest c1 b1 sc1
 > 	|fst b1 == -1 = [Rest (snd b1)]
@@ -145,7 +162,6 @@ testChords = [(C,4),(D,4)(E,4)]
  testSumOfChord = sumOfChord 
 
 
-
 This maps some notes to a chord. 
 
 > mapChord :: NoteList -> Dur -> Music
@@ -179,17 +195,14 @@ autoComp creates a song with a baseline and chords.
 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
-> autoComp bs cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass bs ionian $ splitChord bs cp)
+> autoComp bs cp key = (Instr "piano" $ Tempo 2 $ (foldr1 (:+:) (autoChord key cp))) :=: (Tempo 2 $ autoBass bs key $ splitChord bs cp)
 
 
 MIGHT COME IN HANDY
 
 
 
-> basic, calypso, boogie :: BassStyle
-> basic = cycle [(0,hn),(4,hn)]
-> calypso = cycle [(-1, qn),(0, en),(2, en), (-1, qn),(0,en),(2,en)]
-> boogie = cycle [(0,en),(4,en),(5,en),(4,en),(0,en),(4,en),(5,en),(4,en)]
+
 > ionian = [0, 2, 4, 5, 7, 9, 11]
 > lydian = [0, 2, 4, 6, 7, 9, 11	]
 > mixolydian = [0, 2, 4, 5, 7, 9, 10]
