@@ -124,6 +124,11 @@ Boogie bass is just a repetiorion of eight notes in the pattern 0, 4, 5, 4 and t
 
 
 Our main goal in this section is to implement the autoBass function and to do that we need some helpers functions.
+Scince our BassStyles are strictly defined the songs that goes into the program most often doesn't match and therefore
+the need of a function that can divid our ChordProgression into a ChordProgression that fits the basspattern arises. 
+The splitChord function solves that problem provided the BassStyle to be used and the songs ChordProgression it generates 
+the formated ChordProgression. This function is used in autoComp before the calling of autoBass.
+
 
 > splitChord :: BassStyle -> ChordProgression -> ChordProgression 
 > splitChord [] _ = []
@@ -131,6 +136,22 @@ Our main goal in this section is to implement the autoBass function and to do th
 > splitChord (b:bl) (c:cl)
 > 	| snd c > snd b = splitChord (b:bl) ([(fst c, (snd c)/2), (fst c, (snd c)/2)] ++ cl)
 > 	| otherwise =   c: splitChord bl cl
+
+In a song you would want to use different scales depending on if the song are in Major or Minor chords.
+To get the song to sound better we can choose which scale to use acording to the relative possition that
+we are in the scale. For the Major scales the three different BassStyles are independent on ionian, mixolydian and lydian scale
+and therefor we don't need to consider them in this example. In the Minor scales the Dorian scale seperate from the others
+and must therefor be handled. The proper way to do this is to check the songs PitchClass and compare it to the second position
+in one of the Minor scale, if these match we use Dorian scale and if it doesn't match we can use aeolian or phrygian independently.
+
+Position		Major chord		Minor chord
+1						Ionian		
+2						Mixolydian		Dorian
+3													Phrygian
+4						Lydian		
+5						Mixolydian		
+6													Aeolian
+7
 
 > getScale :: Key -> Chord ->Scale
 > getScale k c
@@ -143,14 +164,18 @@ Our main goal in this section is to implement the autoBass function and to do th
 > 		| otherwise = aeolian
 
 
+The calypso bass has a rest in it and that need to be handled to. That is what the handleRest function solves.
+
 > handleRest :: Chord -> (Int, Dur) -> Scale -> [Music]
 > handleRest c1 b1 sc1
 > 	|fst b1 == -1 = [Rest (snd b1)]
 > 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 65]]
 > 	where
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
-> 	pitch = 2 + div (fromJust $ lookupInt notes (fst c1)) 12
+> 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
 
+AutoBass uses these helperfunctions uses the helperfucktions recursivly to generate a Music object of the whole
+bassline given the BassStyle, the Kay and ChordProgression. 
 
 > autoBass :: BassStyle -> Key -> ChordProgression -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
