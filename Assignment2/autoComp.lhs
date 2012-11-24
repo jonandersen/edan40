@@ -81,10 +81,12 @@ Our model for chords, can be expanded
 > 	| snd k == Major = ionian
 >  	| otherwise = isDorian k c
 > 	where
+> 	isDorian :: Key -> Chord -> [Int]
 > 	isDorian k c
 > 		| (fromJust $ lookupInt notes (fst c)) == ((fromJust $ lookupInt notes (fst k)) + 3) = dorian
 > 		| otherwise = aeolian
 
+> handleRest :: Chord -> (Int, Dur) -> Scale -> [Music]
 > handleRest c1 b1 sc1
 > 	|fst b1 == -1 = [Rest (snd b1)]
 > 	|otherwise = [Note (fst note, pitch ) (snd b1) [Volume 65]]
