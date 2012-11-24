@@ -9,7 +9,8 @@
 ///UTIL STUFF///
 
 > type Key = (PitchClass, Mode)
-> type NoteList = [(PitchClass, Octave)]
+> type Note = (PitchClass, Octave)
+> type NoteList = [Note]
 > type Chord = (PitchClass, Dur)
 > type ChordProgression = [Chord]
 > type Triad = [Int]
@@ -107,15 +108,29 @@ If C, [0,4,7] -> [C,E,G]
 > sumOfChord :: NoteList -> Int
 > sumOfChord chords =  sum $ zipWith (*) (snd $ unzip chords) (map (fromJust) $ map (lookupInt notes ) $ fst $ unzip chords)
 
+
+
+> reversedNote :: Note -> Note
+> reversedNote (pitch,octave) = (pitch,octave)
+
+
 > findTightest :: NoteList -> NoteList
 > findTightest [] = []
-> findTightest (x:xs) = xs
+> findTightest (x:xs) 
+>    | summed  > summedNew = x:findTightest xs
+>    | otherwise = x:findTightest xs
+>    where summed = sumOfChord (x:xs)
+>          summedNew = sumOfChord ((reversedNote x):xs) 
 
 
 > testFindClosets = findClosets 55 G 
 
 testChords :: NoteList
 testChords = [(C,4),(D,4)(E,4)]
+
+[(E,4),(G,4),(C,5)]
+
+[(E,4),(C,5),(G,5)]
 
  testSumOfChord = sumOfChord 
 
@@ -142,7 +157,7 @@ AutoChord generates the chords of the song.
 > createChords :: Key -> ChordProgression -> NoteList -> [Music] 
 > createChords _ [] _ = []																
 > createChords rootKey ((note,dur):keys) previous = (mapChord current dur) : createChords rootKey keys current
->    where current = (createChord previous note $ findTriad rootKey note)																
+>    where current = findTightest (createChord previous note $ findTriad rootKey note)																
 																					
 
 > autoChord :: Key -> ChordProgression -> [Music] 
