@@ -194,11 +194,14 @@ We have some basic rules of thumbs that will make the end result sound somewhat 
 	 following:
 
 > noteList = take 13 $ drop 52 notes
+> intList = take 13 $ drop 52 [0,1..]
 
-2. We want to minimize the distance of the notes from the previous played .
+2. We want to minimize the distance of the note in the new chord from the note in the previous played chord. If
+   the previous played chord was C [0,4,7] and the new chord to be played is a D
+   we want to play [2,6,9] and not [14,18,21].
 
-
-
+3. The final rule of thumb is to make the chords tighter. This means that we want to keep the chord notes as close 
+   to each other as possible. For example we want to play [0,4,7] as opposed to [0,4,19].
 
 As we only use three notes for our chord, we can see that Major and Minor chords only have one outcome each.
 
@@ -217,29 +220,42 @@ apply fromJust. As mentioned before our program is not valid if fromJust is not 
 > findPitch n int = (fromJust $ lookupNote n int)
 
 CreateChord takes the current Note(From our melody) and the triad for the key of the song. 
-If we have D -> [0,4,7] we will receive [2,6,9]. As noteList is defined as an interval above the
-end result will be within this. 
+If we have D -> [0,4,7] we will receive [2,6,9]. The first rule of thumb is applied as we ensure that 
+the outcome is within this interval. All triad will be as low as possible this means that we will use 
+[0,4,7] if possible instead of [12,16,19]. 
 
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
 
-Make closer deals with the second rule of thumb. 
+To handle the second rule of thumb we have a function which takes the previous Triad, the Current and returns
+a triad where each note is as close to the previous chord as possible. We make a recursive call for each note. For each note 
+we try to move it 12 steps up. If this is possible we check if it's closer to our previous note and if that is the case
+we use it otherwise we use the other. This assumes that we start with the notes as low as possible.
 
 > makeCloser :: Triad -> Triad -> Triad 
 > makeCloser [] [] = []
 > makeCloser (prev:prevs) (curr:currs) 
-> 	| elem new (take 13 $ drop 52 [0,1..]) && abs (new - prev) < abs (curr - prev) = new : makeCloser prevs currs
+> 	| elem new intList && abs (new - prev) < abs (curr - prev) = new : makeCloser prevs currs
 > 	| otherwise = curr : makeCloser prevs currs
 > 	where new = curr + 12
 
+TryToTighten tries to increase or decrease a note while still ensuring that it's within the interval of rule 1.
+As rule 1 assumes we see that we at the most have two notes in the interval and hence the following is valid. 
+Basically we see if there is another note in the interval by adding 12 or subtracting 12. 
+
 > tryToTighten :: Int -> Int
 > tryToTighten t 
-> 	| elem (t + 12) (take 13 $ drop 52 [0,1..]) = t + 12
-> 	| elem (t - 12) (take 13 $ drop 52 [0,1..]) = t - 12
+> 	| elem (t + 12) intList = t + 12
+> 	| elem (t - 12) intList = t - 12
 > 	| otherwise = t
+
+This function is used to make calculate how tight a triad is.  
 
 > sumOfTriad :: Triad -> Int
 > sumOfTriad triad = abs $ foldl1 (-) triad
+
+MakeTighter applies the two above functions in a recursive call for each note in the triad and 
+thus applying the third rule of thumb to the triad. 
 
 > makeTigther :: Triad -> Triad
 > makeTigther [] = []
@@ -248,15 +264,15 @@ Make closer deals with the second rule of thumb.
 > 	| otherwise = t:makeTigther ts
 
 
-
 ConvertToNote takes our triad and converts it to the proper notes to be played in the appropriate octave.
-As we represent all are 
+As we represented all notes as ints we can use a simple division to get the correct octave.
 																					
 > convertToNote :: Triad -> NoteList
 > convertToNote [] = []
 > convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
 
-This maps some notes to a chord. 
+This function maps our Notes and the duration to a music. It creates a chord where the notes
+in the note list is played simultaneous. 
 
 > mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note x dur [Volume 60] | x <- chord ]
