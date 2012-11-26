@@ -77,6 +77,9 @@ NoteList
  
 
 4.Utility
+Here follows some helper functions that are used in different ways through the 
+project.
+
 -- note updaters for mappings
 
 > fd d n = n d v
