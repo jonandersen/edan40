@@ -42,7 +42,11 @@ Major or Minor scale. If a song is in Major the ionian, lydian and mixolydian sc
 the aeolian, dorian and phrygian scales are used. 
 
 When you write a song you are interested in which Chord you are going to play and for how long you are going to play that Chord. 
+<<<<<<< HEAD
 Therefor are the Chord type defined analogous and a list of Chords is defined as a ChordProgression. 
+=======
+Therefor the Chord type are defined analogous and a list of Chords is defined as a ChordProgression. 
+>>>>>>> a9677911cf4f83649909ea09c4a3cfa769e798a1
 
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
@@ -82,7 +86,9 @@ NoteList
 > times (n+1) m = m :+: (times n m)
 
 Given an Indexed list of Notes sometimes you would like to retrieve which PitchClass a certain
-index have and Given a certain PitchClass get the position in the list where you could find the PitchClass
+index have and Given a certain PitchClass get the position in the list where you could find the PitchClass.
+This function returns a Maybe. We make the assumption that if it's Nothing the program is not valid and hence
+fromJust is used throughout the program.  
 
 > lookupNote :: NoteList -> Int -> Maybe PitchClass
 > lookupNote [] _ = Nothing
@@ -103,19 +109,21 @@ index have and Given a certain PitchClass get the position in the list where you
 The first task was to create a BassLine given the Kay of the song, the Chords of the song and
 which BassStyle that we want to use. First of all a BassStyle is defined as a list of Int's and Dur's.
 The Int's represent relative to the current Chord that we are using, how many steps we should move forward in our NoteList 
-when selecting which bass tone we want to play currently. The Dur's represent how long time we want to play this tone. 
-All the BassStyles are looped so they will be played in the same manner through the whole song whit different notes.
+when selecting which bass tone we want to play. The Dur's represent the duration of this tone. 
+All the BassStyles are looped so they will be played in the same manner through the whole song with different notes.
+
 
 > type BassStyle = [(Int, Dur)]
 
-The three different BassStles that we use is basic, calyps and boogie. Basic konsists of 2 half notes where the first is just 
-the same as the current Chord and the second is the fourth note in the scale that we use. 
+The three different BassStyles that we use is basic, calypso and boogie. 
 
-Calypso starts with a quater note rest and then two eight notes. The rest is represented here as a -1 so that the 
+Basic consists of 2 half notes where the first is just the same as the current Chord and the second is the fourth note in the scale that we use. 
+
+Calypso starts with a quarter note rest and then two eight notes. The rest is represented here as a -1 so that the 
 program can identify that it should not create a new Note but instead a Rest. The first of the two eight notes are 
-baed on the current Chord and the second is based on the second note in the scale that we use.
+based on the current Chord and the second is based on the second note in the scale that we use.
 
-Boogie bass is just a repetiorion of eight notes in the pattern 0, 4, 5, 4 and these are used in analogous way as mentioned above.
+Boogie bass is just a repetition of eight notes in the pattern 0, 4, 5, 4 and these are used in analogous way as mentioned above.
 
 > basic, calypso, boogie :: BassStyle
 > basic = cycle [(0,hn),(4,hn)]
@@ -124,10 +132,10 @@ Boogie bass is just a repetiorion of eight notes in the pattern 0, 4, 5, 4 and t
 
 
 Our main goal in this section is to implement the autoBass function and to do that we need some helpers functions.
-Scince our BassStyles are strictly defined the songs that goes into the program most often doesn't match and therefore
-the need of a function that can divid our ChordProgression into a ChordProgression that fits the basspattern arises. 
+Since our BassStyles are strictly defined the songs that goes into the program most often doesn't match and therefore
+the need of a function that can divid our ChordProgression into a ChordProgression that fits the bass pattern arises. 
 The splitChord function solves that problem provided the BassStyle to be used and the songs ChordProgression it generates 
-the formated ChordProgression. This function is used in autoComp before the calling of autoBass.
+the formatted ChordProgression. This function is used in autoComp before the calling of autoBass.
 
 
 > splitChord :: BassStyle -> ChordProgression -> ChordProgression 
@@ -138,9 +146,9 @@ the formated ChordProgression. This function is used in autoComp before the call
 > 	| otherwise =   c: splitChord bl cl
 
 In a song you would want to use different scales depending on if the song are in Major or Minor chords.
-To get the song to sound better we can choose which scale to use acording to the relative possition that
+To get the song to sound better we can choose which scale to use according to the relative position that
 we are in the scale. For the Major scales the three different BassStyles are independent on ionian, mixolydian and lydian scale
-and therefor we don't need to consider them in this example. In the Minor scales the Dorian scale seperate from the others
+and therefor we don't need to consider them in this example. In the Minor scales the Dorian scale separate from the others
 and must therefor be handled. The proper way to do this is to check the songs PitchClass and compare it to the second position
 in one of the Minor scale, if these match we use Dorian scale and if it doesn't match we can use aeolian or phrygian independently.
 
@@ -174,8 +182,8 @@ The calypso bass has a rest in it and that need to be handled to. That is what t
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
 
-AutoBass uses these helperfunctions uses the helperfucktions recursivly to generate a Music object of the whole
-bassline given the BassStyle, the Kay and ChordProgression. 
+AutoBass uses these helper functions uses the helper functions recursively to generate a Music object of the whole
+bass line given the BassStyle, the Kay and ChordProgression. 
 
 > autoBass :: BassStyle -> Key -> ChordProgression -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
@@ -183,17 +191,29 @@ bassline given the BassStyle, the Kay and ChordProgression.
 > autoBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
 
 
-
 ///CHORDS///
+We have some basic rules of thumbs that will make the end result sound somewhat better.
+
+1. All chord notes should be picked from a limited interval. In our case (E:4 -> G:5).
+	 We make this constraint by limiting what notes can be chosen from our notes to the 
+	 following:
+
+> noteList = take 13 $ drop 52 notes
+
+2. We want to minimize the distance of the notes from the previous played .
+
+
+
+
+As we only use three notes for our chord, we can see that Major and Minor chords only have one outcome each.
 
 > findTriad :: Key -> PitchClass -> Triad
 > findTriad (key, mode) note
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
-																					
-> convertToNote :: Triad -> NoteList
-> convertToNote [] = []
-> convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
+
+The two following functions are just helpers on their respectively lookup function. And they simple
+apply fromJust. As mentioned before our program is not valid if fromJust is not valid.
 
 > findPitchInt :: NoteList -> PitchClass -> Int
 > findPitchInt n pitchClass = (fromJust $ lookupInt n pitchClass)
@@ -201,12 +221,14 @@ bassline given the BassStyle, the Kay and ChordProgression.
 > findPitch :: NoteList -> Int -> PitchClass
 > findPitch n int = (fromJust $ lookupNote n int)
 
-> noteList = take 13 $ drop 52 notes
+CreateChord takes the current Note(From our melody) and the triad for the key of the song. 
+If we have D -> [0,4,7] we will receive [2,6,9]. As noteList is defined as an interval above the
+end result will be within this. 
 
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
 
-Assumption made is (E:4 -> G:5)
+Make closer deals with the second rule of thumb. 
 
 > makeCloser :: Triad -> Triad -> Triad 
 > makeCloser [] [] = []
@@ -229,6 +251,15 @@ Assumption made is (E:4 -> G:5)
 > makeTigther (t:ts) 
 > 	| (sumOfTriad $ (tryToTighten t):ts) < (sumOfTriad (t:ts)) = (tryToTighten t):makeTigther ts
 > 	| otherwise = t:makeTigther ts
+
+
+
+ConvertToNote takes our triad and converts it to the proper notes to be played in the appropriate octave.
+As we represent all are 
+																					
+> convertToNote :: Triad -> NoteList
+> convertToNote [] = []
+> convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
 
 This maps some notes to a chord. 
 
