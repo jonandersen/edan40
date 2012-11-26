@@ -16,33 +16,33 @@ a 3 different types of bass lines and chords to a song.
 
 ///UTIL STUFF///
 
-To make everything work defenitions had to be made for the different musical terms.
-The first thing we need to define is the Pitchclass. This attribute decides whitch tone 
+To make everything work definitions had to be made for the different musical terms.
+The first thing we need to define is the Pitchclass. This attribute decides which tone 
 a Note belongs to and there are 21 different PitchClasses defined in Haskore. 
 All tones circulates in the frequency domain. When you double the frequency
-you get the same tone again but in a brighter sound. This fenomenom is called that we have 
+you get the same tone again but in a brighter sound. This phenomena is called that we have 
 raised the note one Octave. 
 
 There is a huge overlap in Notes and to cover all possible notes we only need to define 12 notes in 
 a list called a NoteList. A common way to find notes that sound good when used together is to use
 predefined scales. A Scale in this program is a list of Int's where every entry in the list correspond 
-to a good choise of Notes from our NoteList.
+to a good choice of Notes from our NoteList.
 
-Example: We have our notelist consisting of [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B] and we want to create a song 
+Example: We have our note list consisting of [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B] and we want to create a song 
 in ionian scale defined as follow [0, 2, 4, 5, 7, 9, 11]. Following this scale we would get the notes 
 [C,D,E,F,G,A,B] to use in our song.
 
-A Triad is 3 entries from our scales that are used to create a Chord. In this program we consentrate on Chords consisting 
+A Triad is 3 entries from our scales that are used to create a Chord. In this program we concentrate on Chords consisting 
 of 3 Notes only therefor the name Triad suffices. In a more general application there is Chords consisting 
 of more and less notes than 3.   
 
-The key of a song is definied as a PitchClass and a Mode. The Pitchclass tells us which note we want as our starting point is our 
+The key of a song is defined as a PitchClass and a Mode. The Pitchclass tells us which note we want as our starting point is our 
 scale. If we have PitchClass = E then when we pick index 0 from our NoteList we will get an E. The mode of the song is either in 
 Major or Minor scale. If a song is in Major the ionian, lydian and mixolydian scales are used and if the song is in Minor scale 
 the aeolian, dorian and phrygian scales are used. 
 
 When you write a song you are interested in which Chord you are going to play and for how long you are going to play that Chord. 
-Therefor are the Chord type defiened analogous and a list of Chords is defined as a ChordProgression. 
+Therefor are the Chord type defined analogous and a list of Chords is defined as a ChordProgression. 
 
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
@@ -81,8 +81,8 @@ NoteList
 > times  1    m = m
 > times (n+1) m = m :+: (times n m)
 
-Given an Indexed list of Notes sometimes you would like to retrive which PitchClass a certain
-index have and Given a certain PitchClass get the possition in the list where you could find the PitchClass
+Given an Indexed list of Notes sometimes you would like to retrieve which PitchClass a certain
+index have and Given a certain PitchClass get the position in the list where you could find the PitchClass
 
 > lookupNote :: NoteList -> Int -> Maybe PitchClass
 > lookupNote [] _ = Nothing
@@ -103,7 +103,7 @@ index have and Given a certain PitchClass get the possition in the list where yo
 The first task was to create a BassLine given the Kay of the song, the Chords of the song and
 which BassStyle that we want to use. First of all a BassStyle is defined as a list of Int's and Dur's.
 The Int's represent relative to the current Chord that we are using, how many steps we should move forward in our NoteList 
-when selecting which basstone we want to play currently. The Dur's represent how long time we want to play this tone. 
+when selecting which bass tone we want to play currently. The Dur's represent how long time we want to play this tone. 
 All the BassStyles are looped so they will be played in the same manner through the whole song whit different notes.
 
 > type BassStyle = [(Int, Dur)]
@@ -184,11 +184,6 @@ bassline given the BassStyle, the Kay and ChordProgression.
 
 
 
-
-
-
-
-
 ///CHORDS///
 
 > findTriad :: Key -> PitchClass -> Triad
@@ -257,8 +252,9 @@ AutoChord generates the chords of the song.
 >    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 
-autoComp creates a song with a baseline and chords.
-
+autoComp is the main function of this program and combines autoChord and autoBass. This function generates a accompaniment including a specified 
+bass line and the "correct" chords for the song given which BassStyle you want to use, the pitch and duration for 
+the different chords that are to be used and the key of the song. 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
 > autoComp bs cp key =  (autoChord key cp) :=: (Tempo 2 $ autoBass bs key $ splitChord bs cp)
