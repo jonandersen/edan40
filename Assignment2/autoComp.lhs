@@ -16,33 +16,33 @@ a 3 different types of bass lines and chords to a song.
 
 ///UTIL STUFF///
 
-To make everything work defenitions had to be made for the different musical terms.
-The first thing we need to define is the Pitchclass. This attribute decides whitch tone 
+To make everything work definitions had to be made for the different musical terms.
+The first thing we need to define is the Pitchclass. This attribute decides which tone 
 a Note belongs to and there are 21 different PitchClasses defined in Haskore. 
 All tones circulates in the frequency domain. When you double the frequency
-you get the same tone again but in a brighter sound. This fenomenom is called that we have 
+you get the same tone again but in a brighter sound. This phenomena is called that we have 
 raised the note one Octave. 
 
 There is a huge overlap in Notes and to cover all possible notes we only need to define 12 notes in 
 a list called a NoteList. A common way to find notes that sound good when used together is to use
 predefined scales. A Scale in this program is a list of Int's where every entry in the list correspond 
-to a good choise of Notes from our NoteList.
+to a good choice of Notes from our NoteList.
 
 Example: We have our notelist consisting of [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B] and we want to create a song 
 in ionian scale defined as follow [0, 2, 4, 5, 7, 9, 11]. Following this scale we would get the notes 
 [C,D,E,F,G,A,B] to use in our song.
 
-A Triad is 3 entries from our scales that are used to create a Chord. In this program we consentrate on Chords consisting 
+A Triad is 3 entries from our scales that are used to create a Chord. In this program we concentrate on Chords consisting 
 of 3 Notes only therefor the name Triad suffices. In a more general application there is Chords consisting 
 of more and less notes than 3.   
 
-The key of a song is definied as a PitchClass and a Mode. The Pitchclass tells us which note we want as our starting point is our 
+The key of a song is defined as a PitchClass and a Mode. The Pitchclass tells us which note we want as our starting point is our 
 scale. If we have PitchClass = E then when we pick index 0 from our NoteList we will get an E. The mode of the song is either in 
 Major or Minor scale. If a song is in Major the ionian, lydian and mixolydian scales are used and if the song is in Minor scale 
 the aeolian, dorian and phrygian scales are used. 
 
 When you write a song you are interested in which Chord you are going to play and for how long you are going to play that Chord. 
-Therefor are the Chord type defiened analogous and a list of Chords is defined as a ChordProgression. 
+Therefor the Chord type are defined analogous and a list of Chords is defined as a ChordProgression. 
 
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
@@ -81,8 +81,10 @@ NoteList
 > times  1    m = m
 > times (n+1) m = m :+: (times n m)
 
-Given an Indexed list of Notes sometimes you would like to retrive which PitchClass a certain
-index have and Given a certain PitchClass get the possition in the list where you could find the PitchClass
+Given an Indexed list of Notes sometimes you would like to retrieve which PitchClass a certain
+index have and Given a certain PitchClass get the position in the list where you could find the PitchClass.
+This function returns a Maybe. We make the assumption that if it's Nothing the program is not valid and hence
+fromJust is used throughout the program.  
 
 > lookupNote :: NoteList -> Int -> Maybe PitchClass
 > lookupNote [] _ = Nothing
@@ -103,19 +105,20 @@ index have and Given a certain PitchClass get the possition in the list where yo
 The first task was to create a BassLine given the Kay of the song, the Chords of the song and
 which BassStyle that we want to use. First of all a BassStyle is defined as a list of Int's and Dur's.
 The Int's represent relative to the current Chord that we are using, how many steps we should move forward in our NoteList 
-when selecting which basstone we want to play currently. The Dur's represent how long time we want to play this tone. 
-All the BassStyles are looped so they will be played in the same manner through the whole song whit different notes.
+when selecting which bass tone we want to play. The Dur's represent the duration of this tone. 
+All the BassStyles are looped so they will be played in the same manner through the whole song with different notes.
 
 > type BassStyle = [(Int, Dur)]
 
-The three different BassStles that we use is basic, calyps and boogie. Basic konsists of 2 half notes where the first is just 
-the same as the current Chord and the second is the fourth note in the scale that we use. 
+The three different BassStyles that we use is basic, calypso and boogie. 
 
-Calypso starts with a quater note rest and then two eight notes. The rest is represented here as a -1 so that the 
+Basic consists of 2 half notes where the first is just the same as the current Chord and the second is the fourth note in the scale that we use. 
+
+Calypso starts with a quarter note rest and then two eight notes. The rest is represented here as a -1 so that the 
 program can identify that it should not create a new Note but instead a Rest. The first of the two eight notes are 
-baed on the current Chord and the second is based on the second note in the scale that we use.
+based on the current Chord and the second is based on the second note in the scale that we use.
 
-Boogie bass is just a repetiorion of eight notes in the pattern 0, 4, 5, 4 and these are used in analogous way as mentioned above.
+Boogie bass is just a repetition of eight notes in the pattern 0, 4, 5, 4 and these are used in analogous way as mentioned above.
 
 > basic, calypso, boogie :: BassStyle
 > basic = cycle [(0,hn),(4,hn)]
@@ -124,10 +127,10 @@ Boogie bass is just a repetiorion of eight notes in the pattern 0, 4, 5, 4 and t
 
 
 Our main goal in this section is to implement the autoBass function and to do that we need some helpers functions.
-Scince our BassStyles are strictly defined the songs that goes into the program most often doesn't match and therefore
-the need of a function that can divid our ChordProgression into a ChordProgression that fits the basspattern arises. 
+Since our BassStyles are strictly defined the songs that goes into the program most often doesn't match and therefore
+the need of a function that can divid our ChordProgression into a ChordProgression that fits the bass pattern arises. 
 The splitChord function solves that problem provided the BassStyle to be used and the songs ChordProgression it generates 
-the formated ChordProgression. This function is used in autoComp before the calling of autoBass.
+the formatted ChordProgression. This function is used in autoComp before the calling of autoBass.
 
 
 > splitChord :: BassStyle -> ChordProgression -> ChordProgression 
@@ -138,9 +141,9 @@ the formated ChordProgression. This function is used in autoComp before the call
 > 	| otherwise =   c: splitChord bl cl
 
 In a song you would want to use different scales depending on if the song are in Major or Minor chords.
-To get the song to sound better we can choose which scale to use acording to the relative possition that
+To get the song to sound better we can choose which scale to use according to the relative position that
 we are in the scale. For the Major scales the three different BassStyles are independent on ionian, mixolydian and lydian scale
-and therefor we don't need to consider them in this example. In the Minor scales the Dorian scale seperate from the others
+and therefor we don't need to consider them in this example. In the Minor scales the Dorian scale separate from the others
 and must therefor be handled. The proper way to do this is to check the songs PitchClass and compare it to the second position
 in one of the Minor scale, if these match we use Dorian scale and if it doesn't match we can use aeolian or phrygian independently.
 
@@ -174,8 +177,8 @@ The calypso bass has a rest in it and that need to be handled to. That is what t
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
 
-AutoBass uses these helperfunctions uses the helperfucktions recursivly to generate a Music object of the whole
-bassline given the BassStyle, the Kay and ChordProgression. 
+AutoBass uses these helper functions uses the helper functions recursively to generate a Music object of the whole
+bass line given the BassStyle, the Kay and ChordProgression. 
 
 > autoBass :: BassStyle -> Key -> ChordProgression -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
