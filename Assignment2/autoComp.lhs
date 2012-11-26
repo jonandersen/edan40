@@ -5,14 +5,15 @@ EDAN40 - Functional Music
 Jon Andersen ada08jan@student.lu.se 
 Marcus Carlberg ada08mca@student.lu.se
 
-Introduction
-AutomComp is a program that given a list of Chords and a Key of a song can generate 
-a 3 different types of bass lines and chords to a song. 
+1.Introduction
+AutomComp is a program that given a list of Chords and a Key of a song can generate 3 different types of bass lines and chords to a song. To implement
+this program we use a musical library called Haskore. 
 
+2.Library
 The name of this module is AutoComp, this name has to be imported to the
 song file otherwise the autoComp function would not be compiled and made
-executable. Haskore stands for most of the musucal theory in this project 
-and is used to describe songs in a program. Hiding key felt necessary because we wanted to have our own defenition of it mentioned further down in this test. Ratio is needed to describe ratios and scince all note's duration is described in parts of a bar in haskore this module was needed. Maybe is used to handle lookups.
+executable. Haskore stands for most of the musical theory in this project 
+and is used to describe songs in a program. Hiding key felt necessary because we wanted to have our own definition of it mentioned further down in this test. Ratio is needed to describe ratios and since all note's duration is described in parts of a bar in Haskore this module was needed. Maybe is used to handle lookups.
 
 > module AutoComp where
 > import Haskore hiding (Key)
@@ -20,6 +21,7 @@ and is used to describe songs in a program. Hiding key felt necessary because we
 > import Maybe
 
 
+3.Types
 To make everything work definitions had to be made for the different musical terms.
 The first thing we need to define is the Pitchclass. This attribute decides which tone 
 a Note belongs to and there are 21 different PitchClasses defined in Haskore. 
@@ -46,11 +48,8 @@ Major or Minor scale. If a song is in Major the ionian, lydian and mixolydian sc
 the aeolian, dorian and phrygian scales are used. 
 
 When you write a song you are interested in which Chord you are going to play and for how long you are going to play that Chord. 
-<<<<<<< HEAD
-Therefor are the Chord type defined analogous and a list of Chords is defined as a ChordProgression. 
-=======
 Therefor the Chord type are defined analogous and a list of Chords is defined as a ChordProgression. 
->>>>>>> a9677911cf4f83649909ea09c4a3cfa769e798a1
+
 
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
@@ -77,6 +76,7 @@ NoteList
 > notes = zip (cycle [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B]) [0,1..]
  
 
+4.Utility
 -- note updaters for mappings
 
 > fd d n = n d v
@@ -108,8 +108,7 @@ fromJust is used throughout the program.
 >		| otherwise = lookupInt ts m
 
 
-///BASS///
-
+5.Bass
 The first task was to create a BassLine given the Kay of the song, the Chords of the song and
 which BassStyle that we want to use. First of all a BassStyle is defined as a list of Int's and Dur's.
 The Int's represent relative to the current Chord that we are using, how many steps we should move forward in our NoteList 
@@ -195,7 +194,7 @@ bass line given the BassStyle, the Kay and ChordProgression.
 > autoBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
 
 
-///CHORDS///
+6.Chords
 We have some basic rules of thumbs that will make the end result sound somewhat better.
 
 1. All chord notes should be picked from a limited interval. In our case (E:4 -> G:5).
@@ -301,7 +300,7 @@ AutoChord creates the first chord of the song and then calls the createChords fu
 > autoChord rootKey cp = Instr "piano" $ Tempo 2 $ foldr1 (:+:) $ createChords rootKey cp headChord
 >    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
-///AUTOMUSIC///
+7.Automusic
 
 autoComp is the main function of this program and combines autoChord and autoBass. This function generates a accompaniment including a specified 
 bass line and the "correct" chords for the song given which BassStyle you want to use, the pitch and duration for 
