@@ -198,6 +198,10 @@ bass line given the BassStyle, the Kay and ChordProgression.
 
 
 6.Chords
+We define a chord as a triad and a duration. We work with chords as ints and only when creating
+the chord with the duration we map it back to the PitchClass and a Octave. As of this
+we will only pass triads 
+
 We have some basic rules of thumbs that will make the end result sound somewhat better.
 
 1. All chord notes should be picked from a limited interval. In our case (E:4 -> G:5).
@@ -300,7 +304,7 @@ rule of thumb 2 can be made.
 AutoChord creates the first chord of the song and then calls the createChords function to create the rest. 
 
 > autoChord :: Key -> ChordProgression -> Music
-> autoChord rootKey cp = Instr "piano" $ Tempo 2 $ foldr1 (:+:) $ createChords rootKey cp headChord
+> autoChord rootKey cp = Instr "piano" $ foldr1 (:+:) $ createChords rootKey cp headChord
 >    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 7.Automusic
@@ -310,7 +314,7 @@ bass line and the "correct" chords for the song given which BassStyle you want t
 the different chords that are to be used and the key of the song. 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
-> autoComp bs cp key =  (autoChord key cp) :=: (Tempo 2 $ autoBass bs key $ splitChord bs cp)
+> autoComp bs cp key =  (autoChord key cp) :=: (autoBass bs key $ splitChord bs cp)
 
 
 
