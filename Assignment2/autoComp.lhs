@@ -9,12 +9,16 @@ Introduction
 AutomComp is a program that given a list of Chords and a Key of a song can generate 
 a 3 different types of bass lines and chords to a song. 
 
+The name of this module is AutoComp, this name has to be imported to the
+song file otherwise the autoComp function would not be compiled and made
+executable. Haskore stands for most of the musucal theory in this project 
+and is used to describe songs in a program. Hiding key felt necessary because we wanted to have our own defenition of it mentioned further down in this test. Ratio is needed to describe ratios and scince all note's duration is described in parts of a bar in haskore this module was needed. Maybe is used to handle lookups.
+
 > module AutoComp where
 > import Haskore hiding (Key)
 > import Ratio 
 > import Maybe
 
-///UTIL STUFF///
 
 To make everything work definitions had to be made for the different musical terms.
 The first thing we need to define is the Pitchclass. This attribute decides which tone 
