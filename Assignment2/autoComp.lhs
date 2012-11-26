@@ -200,7 +200,7 @@ bass line given the BassStyle, the Kay and ChordProgression.
 6.Chords
 We define a chord as a triad and a duration. We work with chords as ints and only when creating
 the chord with the duration we map it back to the PitchClass and a Octave. As of this
-we will only pass triads 
+we will only pass triads to the functions. 
 
 We have some basic rules of thumbs that will make the end result sound somewhat better.
 
