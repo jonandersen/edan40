@@ -8,7 +8,7 @@ song = lmap vol [b 2 qn, d 3 qn, d 3 en, e 3 en, e 3 qn, g 3 sn, fs 3 sn,g 3 sn,
 rest = enr
 voice = times 3 (song :+: rest)
 
-ironChords =  rep [(B, hn) ,(E , hn), (G, hn), (E, hn),(B, hn) ,(E , hn), (G, hn), (E, hn),(B, hn) ,(E , hn), (G, hn), (E, hn)] 3
+ironChords = rep [(B, hn) ,(E , hn), (G, hn), (E, hn)] 3
 ironman = Instr "Church Organ" $ voice
 
 
