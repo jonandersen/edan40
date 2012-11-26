@@ -9,12 +9,16 @@ Introduction
 AutomComp is a program that given a list of Chords and a Key of a song can generate 
 a 3 different types of bass lines and chords to a song. 
 
+The name of this module is AutoComp, this name has to be imported to the
+song file otherwise the autoComp function would not be compiled and made
+executable. Haskore stands for most of the musucal theory in this project 
+and is used to describe songs in a program. Hiding key felt necessary because we wanted to have our own defenition of it mentioned further down in this test. Ratio is needed to describe ratios and scince all note's duration is described in parts of a bar in haskore this module was needed. Maybe is used to handle lookups.
+
 > module AutoComp where
 > import Haskore hiding (Key)
 > import Ratio 
 > import Maybe
 
-///UTIL STUFF///
 
 To make everything work definitions had to be made for the different musical terms.
 The first thing we need to define is the Pitchclass. This attribute decides which tone 
@@ -28,7 +32,7 @@ a list called a NoteList. A common way to find notes that sound good when used t
 predefined scales. A Scale in this program is a list of Int's where every entry in the list correspond 
 to a good choice of Notes from our NoteList.
 
-Example: We have our notelist consisting of [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B] and we want to create a song 
+Example: We have our note list consisting of [C,Cs,D,Ds,E,F,Fs,G,Gs,A,As,B] and we want to create a song 
 in ionian scale defined as follow [0, 2, 4, 5, 7, 9, 11]. Following this scale we would get the notes 
 [C,D,E,F,G,A,B] to use in our song.
 
@@ -42,7 +46,11 @@ Major or Minor scale. If a song is in Major the ionian, lydian and mixolydian sc
 the aeolian, dorian and phrygian scales are used. 
 
 When you write a song you are interested in which Chord you are going to play and for how long you are going to play that Chord. 
+<<<<<<< HEAD
+Therefor are the Chord type defined analogous and a list of Chords is defined as a ChordProgression. 
+=======
 Therefor the Chord type are defined analogous and a list of Chords is defined as a ChordProgression. 
+>>>>>>> a9677911cf4f83649909ea09c4a3cfa769e798a1
 
 > type Note = (PitchClass, Octave)
 > type NoteList = [Note]
@@ -107,6 +115,7 @@ which BassStyle that we want to use. First of all a BassStyle is defined as a li
 The Int's represent relative to the current Chord that we are using, how many steps we should move forward in our NoteList 
 when selecting which bass tone we want to play. The Dur's represent the duration of this tone. 
 All the BassStyles are looped so they will be played in the same manner through the whole song with different notes.
+
 
 > type BassStyle = [(Int, Dur)]
 
@@ -294,8 +303,9 @@ AutoChord generates the chords of the song.
 >    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
 
-autoComp creates a song with a baseline and chords.
-
+autoComp is the main function of this program and combines autoChord and autoBass. This function generates a accompaniment including a specified 
+bass line and the "correct" chords for the song given which BassStyle you want to use, the pitch and duration for 
+the different chords that are to be used and the key of the song. 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
 > autoComp bs cp key =  (autoChord key cp) :=: (Tempo 2 $ autoBass bs key $ splitChord bs cp)
