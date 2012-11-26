@@ -186,22 +186,29 @@ bass line given the BassStyle, the Kay and ChordProgression.
 > autoBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
 
 
-
-
-
-
-
-
 ///CHORDS///
+We have some basic rules of thumbs that will make the end result sound somewhat better.
+
+1. All chord notes should be picked from a limited interval. In our case (E:4 -> G:5).
+	 We make this constraint by limiting what notes can be chosen from our notes to the 
+	 following:
+
+> noteList = take 13 $ drop 52 notes
+
+2. We want to minimize the distance of the notes from the previous played .
+
+
+
+
+As we only use three notes for our chord, we can see that Major and Minor chords only have one outcome each.
 
 > findTriad :: Key -> PitchClass -> Triad
 > findTriad (key, mode) note
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
-																					
-> convertToNote :: Triad -> NoteList
-> convertToNote [] = []
-> convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
+
+The two following functions are just helpers on their respectively lookup function. And they simple
+apply fromJust. As mentioned before our program is not valid if fromJust is not valid.
 
 > findPitchInt :: NoteList -> PitchClass -> Int
 > findPitchInt n pitchClass = (fromJust $ lookupInt n pitchClass)
@@ -209,12 +216,14 @@ bass line given the BassStyle, the Kay and ChordProgression.
 > findPitch :: NoteList -> Int -> PitchClass
 > findPitch n int = (fromJust $ lookupNote n int)
 
-> noteList = take 13 $ drop 52 notes
+CreateChord takes the current Note(From our melody) and the triad for the key of the song. 
+If we have D -> [0,4,7] we will receive [2,6,9]. As noteList is defined as an interval above the
+end result will be within this. 
 
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
 
-Assumption made is (E:4 -> G:5)
+Make closer deals with the second rule of thumb. 
 
 > makeCloser :: Triad -> Triad -> Triad 
 > makeCloser [] [] = []
@@ -237,6 +246,15 @@ Assumption made is (E:4 -> G:5)
 > makeTigther (t:ts) 
 > 	| (sumOfTriad $ (tryToTighten t):ts) < (sumOfTriad (t:ts)) = (tryToTighten t):makeTigther ts
 > 	| otherwise = t:makeTigther ts
+
+
+
+ConvertToNote takes our triad and converts it to the proper notes to be played in the appropriate octave.
+As we represent all are 
+																					
+> convertToNote :: Triad -> NoteList
+> convertToNote [] = []
+> convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
 
 This maps some notes to a chord. 
 
