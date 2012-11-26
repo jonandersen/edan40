@@ -1,6 +1,3 @@
-\section{Haskore CSound Tutorial}
-\label{csound-tut}
-
 EDAN40 - Functional Music
 Jon Andersen ada08jan@student.lu.se 
 Marcus Carlberg ada08mca@student.lu.se
