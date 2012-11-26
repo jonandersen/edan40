@@ -286,22 +286,22 @@ in the note list is played simultaneous.
 > mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note x dur [Volume 60] | x <- chord ]
 
-///AUTOMUSIC///
-
-AutoChord generates the chords of the song.
-
-																					Needs to be updated
+CreateChords applies all the above functions to create a list of music. It makes an recursive call for each of 
+the notes in the chord progression. For each call it passes the current chord to the next to ensure that
+rule of thumb 2 can be made. 
 
 > createChords :: Key -> ChordProgression -> Triad -> [Music] 
 > createChords _ [] _ = []																
 > createChords rootKey ((note,dur):keys) previous = (mapChord (convertToNote current) dur) : createChords rootKey keys current
 >    where current = makeTigther $ makeCloser previous $ createChord note $ findTriad rootKey note															
 																					
+AutoChord creates the first chord of the song and then calls the createChords function to create the rest. 
 
 > autoChord :: Key -> ChordProgression -> Music
 > autoChord rootKey cp = Instr "piano" $ Tempo 2 $ foldr1 (:+:) $ createChords rootKey cp headChord
 >    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
 
+///AUTOMUSIC///
 
 autoComp is the main function of this program and combines autoChord and autoBass. This function generates a accompaniment including a specified 
 bass line and the "correct" chords for the song given which BassStyle you want to use, the pitch and duration for 
