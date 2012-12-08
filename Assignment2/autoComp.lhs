@@ -303,9 +303,7 @@ AutoChord creates the first chord of the song and then calls the createChords fu
 
 7. Automusic
 
-autoComp is the main function of this program and combines autoChord and autoBass. This function generates a accompaniment including a specified 
-bass line and the "correct" chords for the song given which BassStyle you want to use, the pitch and duration for 
-the different chords that are to be used and the key of the song. 
+To generate an accompaniment there is a need to combine the bass, the cords and the song of the song in a nice manner. It is important that the "correct" chords are used for the song to sound good and it is preferable that the bass is handled in a "correct" manner also. The "" in "correct" is used because there are many different ways to chose chords in songs and we are only doing the theoretically correct way. When we have all of these attributes we can combine them to a finished song by the use of autoComp.
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
 > autoComp bs cp key =  (autoChord key cp) :=: (autoBass bs key cp)
