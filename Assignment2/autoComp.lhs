@@ -286,17 +286,14 @@ Since all chords has been represented as triads we need to map them back to chor
 > mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note x dur [Volume 60] | x <- chord ]
 
-CreateChords applies all the above functions to create a list of music. It makes an recursive call for each of 
-the notes in the chord progression. For each call it passes the current chord to the next to ensure that
-rule of thumb 2 can be made. 
+Now that we established our rules we and created functions for them. We need to put it all together. AutoChord generates music
+based on the chord progression.
 
 > createChords :: Key -> ChordProgression -> Triad -> [Music] 
 > createChords _ [] _ = []																
 > createChords rootKey ((note,dur):keys) previous = (mapChord (convertToNote current) dur) : createChords rootKey keys current
 >    where current = pickTightest $ pickClosest previous$  applyPermutations $ createChord note $ findTriad rootKey note															
 																					
-AutoChord creates the first chord of the song and then calls the createChords function to create the rest. 
-
 > autoChord :: Key -> ChordProgression -> Music
 > autoChord rootKey cp = Instr "piano" $ foldr1 (:+:) $ createChords rootKey cp headChord
 >    where headChord = pickTightest $ applyPermutations $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp)
