@@ -75,7 +75,7 @@ NoteList
 
 4.Utility
 Here follows some helper functions that are used in different ways through the 
-project.
+project. Mostly to map different notes to each other and thus creating chords and to look up notes in lists in different ways.
 
 -- note updaters for mappings
 
@@ -90,8 +90,8 @@ project.
 > times (n+1) m = m :+: (times n m)
 
 Given an Indexed list of Notes sometimes you would like to retrieve which PitchClass a certain
-index have and Given a certain PitchClass get the position in the list where you could find the PitchClass.
-This function returns a Maybe. We make the assumption that if it's Nothing the program is not valid and hence
+index have and given a certain PitchClass get the position in the list where you could find the PitchClass. These methods are used to accomplish this 
+We make the assumption that if it's Nothing the program is not valid and hence
 fromJust is used throughout the program.  
 
 > lookupNote :: NoteList -> Int -> Maybe PitchClass
@@ -185,14 +185,14 @@ The calypso bass has a rest in it and that need to be handled to. That is what t
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
 
-AutoBass uses these helper functions uses the helper functions recursively to generate a Music object of the whole
-bass line given the BassStyle, the Kay and ChordProgression. 
+AutoBass uses these helper functions recursively to generate a Music object of the whole bass line given the BassStyle, the Kay and ChordProgression. 
 
 > autoBass :: BassStyle -> Key -> ChordProgression -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
 > autoBass _ _ [] = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> autoBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
-
+> autoBass bl k cl = generateBass bl k (splitChord bl cl)
+>	where 
+>	generateBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
 
 6.Chords
 We define a chord as a triad and a duration. We work with chords as ints and only when creating
@@ -222,8 +222,9 @@ As we only use three notes for our chord, we can see that Major and Minor chords
 > 	| mode == Major = [0,4,7]
 > 	| otherwise = [0,3,7]								
 
-The two following functions are just helpers on their respectively lookup function. And they simple
-apply fromJust. As mentioned before our program is not valid if fromJust is not valid.
+There is a need to lookup notes and map them to in, we use the following helper functions.
+As mentioned before our program is not valid if the note is not in the list. The program will throw an
+exception if this happens. 
 
 > findPitchInt :: NoteList -> PitchClass -> Int
 > findPitchInt n pitchClass = (fromJust $ lookupInt n pitchClass)
@@ -231,13 +232,15 @@ apply fromJust. As mentioned before our program is not valid if fromJust is not 
 > findPitch :: NoteList -> Int -> PitchClass
 > findPitch n int = (fromJust $ lookupNote n int)
 
-CreateChord takes the current Note(From our melody) and the triad for the key of the song. 
+There is a need to take the current Note(From our melody) and the triad for the key of the song. 
 If we have D -> [0,4,7] we will receive [2,6,9]. The first rule of thumb is applied as we ensure that 
 the outcome is within this interval. All triad will be as low as possible this means that we will use 
-[0,4,7] if possible instead of [12,16,19]. 
+[0,4,7] if possible instead of [12,16,19]. createChord accomplishes this.
 
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
+
+The second rule of thumb 
 
 > permutations = [[0,0,0],
 > 								[12,0,0],
@@ -252,7 +255,7 @@ the outcome is within this interval. All triad will be as low as possible this m
 > applyPermutations triad = filterInRange $ map (zipWith (+) triad) permutations
 
 > filterInRange :: [Triad] -> [Triad]
-> filterInRange = filter (all (inRange (52,67)))
+> filterInRange = filter (all (inRange (52,64)))
 
 > getMinimum triads f = minimum $ map f triads
 
@@ -306,7 +309,6 @@ bass line and the "correct" chords for the song given which BassStyle you want t
 the different chords that are to be used and the key of the song. 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
-> autoComp bs cp key =  (autoChord key cp) :=: (autoBass bs key $ splitChord bs cp)
-
+> autoComp bs cp key =  (autoChord key cp) :=: (autoBass bs key cp)
 
 
