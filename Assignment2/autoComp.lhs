@@ -75,7 +75,7 @@ NoteList
 
 4.Utility
 Here follows some helper functions that are used in different ways through the 
-project.
+project. Mostly to map different notes to each other and thus creating chords and to look up notes in lists in different ways.
 
 -- note updaters for mappings
 
@@ -90,8 +90,8 @@ project.
 > times (n+1) m = m :+: (times n m)
 
 Given an Indexed list of Notes sometimes you would like to retrieve which PitchClass a certain
-index have and Given a certain PitchClass get the position in the list where you could find the PitchClass.
-This function returns a Maybe. We make the assumption that if it's Nothing the program is not valid and hence
+index have and given a certain PitchClass get the position in the list where you could find the PitchClass. These methods are used to accomplish this 
+We make the assumption that if it's Nothing the program is not valid and hence
 fromJust is used throughout the program.  
 
 > lookupNote :: NoteList -> Int -> Maybe PitchClass
@@ -185,8 +185,7 @@ The calypso bass has a rest in it and that need to be handled to. That is what t
 > 	note = (!!) notes  (mod (((!!) sc1 (fst b1)) + (fromJust $ lookupInt notes (fst c1))) 12)
 > 	pitch = 3 + div (fromJust $ lookupInt notes (fst c1)) 12
 
-AutoBass uses these helper functions uses the helper functions recursively to generate a Music object of the whole
-bass line given the BassStyle, the Kay and ChordProgression. 
+AutoBass uses these helper functions recursively to generate a Music object of the whole bass line given the BassStyle, the Kay and ChordProgression. 
 
 > autoBass :: BassStyle -> Key -> ChordProgression -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
@@ -232,10 +231,10 @@ apply fromJust. As mentioned before our program is not valid if fromJust is not 
 > findPitch :: NoteList -> Int -> PitchClass
 > findPitch n int = (fromJust $ lookupNote n int)
 
-CreateChord takes the current Note(From our melody) and the triad for the key of the song. 
+There is a need to take the current Note(From our melody) and the triad for the key of the song. 
 If we have D -> [0,4,7] we will receive [2,6,9]. The first rule of thumb is applied as we ensure that 
 the outcome is within this interval. All triad will be as low as possible this means that we will use 
-[0,4,7] if possible instead of [12,16,19]. 
+[0,4,7] if possible instead of [12,16,19]. createChord accomplishes this.
 
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
@@ -279,7 +278,7 @@ Basically we see if there is another note in the interval by adding 12 or subtra
 > 	| elem (t - 12) intList = t - 12
 > 	| otherwise = t
 
-This function is used to make calculate how tight a triad is.  
+To make this work there is a need to be able to calculate how tight a chord is so that you can decide whether you want it to be tighter or not to increase the sound quality.
 
 > sumOfTriad :: Triad -> Int
 > sumOfTriad triad = abs $ foldl1 (-) triad
