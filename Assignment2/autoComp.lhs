@@ -239,7 +239,6 @@ the outcome is within this interval. All triad will be as low as possible this m
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
 
-
 > permutations = [[0,0,0],
 > 								[12,0,0],
 > 								[0,12,0],
@@ -250,48 +249,24 @@ the outcome is within this interval. All triad will be as low as possible this m
 > 	 							[12,12,12]]
 
 > applyPermutations :: Triad -> [Triad]
-> applyPermutations triad = map (zipWith (+) triad) permutations
+> applyPermutations triad = filterInRange $ map (zipWith (+) triad) permutations
 
 > filterInRange :: [Triad] -> [Triad]
 > filterInRange = filter (all (inRange (52,67)))
 
+> getMinimum triads f = minimum $ map f triads
 
-To handle the second rule of thumb we have a function which takes the previous Triad, the Current and returns
-a triad where each note is as close to the previous chord as possible. We make a recursive call for each note. For each note 
-we try to move it 12 steps up. If this is possible we check if it's closer to our previous note and if that is the case
-we use it otherwise we use the other. This assumes that we start with the notes as low as possible.
+> pickClosest :: Triad -> [Triad] -> [Triad]
+> pickClosest triad triads = filter(\x -> closeSum triad x <= (getMinimum triads (closeSum triad))) triads
 
-> makeCloser :: Triad -> Triad -> Triad 
-> makeCloser [] [] = []
-> makeCloser (prev:prevs) (curr:currs) 
-> 	| elem new intList && abs (new - prev) < abs (curr - prev) = new : makeCloser prevs currs
-> 	| otherwise = curr : makeCloser prevs currs
-> 	where new = curr + 12
+> closeSum :: Triad -> Triad -> Int
+> closeSum x y = abs $ sum $ zipWith (-) x y 
 
-TryToTighten tries to increase or decrease a note while still ensuring that it's within the interval of rule 1.
-As rule 1 assumes we see that we at the most have two notes in the interval and hence the following is valid. 
-Basically we see if there is another note in the interval by adding 12 or subtracting 12. 
+> pickTightest :: [Triad] -> Triad
+> pickTightest triads = head $ filter (\x -> tightSum x <= (getMinimum triads tightSum)) triads
 
-> tryToTighten :: Int -> Int
-> tryToTighten t 
-> 	| elem (t + 12) intList = t + 12
-> 	| elem (t - 12) intList = t - 12
-> 	| otherwise = t
-
-This function is used to make calculate how tight a triad is.  
-
-> sumOfTriad :: Triad -> Int
-> sumOfTriad triad = abs $ foldl1 (-) triad
-
-MakeTighter applies the two above functions in a recursive call for each note in the triad and 
-thus applying the third rule of thumb to the triad. 
-
-> makeTigther :: Triad -> Triad
-> makeTigther [] = []
-> makeTigther (t:ts) 
-> 	| (sumOfTriad $ (tryToTighten t):ts) < (sumOfTriad (t:ts)) = (tryToTighten t):makeTigther ts
-> 	| otherwise = t:makeTigther ts
-
+> tightSum :: Triad -> Int
+> tightSum triad = (maximum triad) - (minimum triad)
 
 ConvertToNote takes our triad and converts it to the proper notes to be played in the appropriate octave.
 As we represented all notes as ints we can use a simple division to get the correct octave.
@@ -310,16 +285,19 @@ CreateChords applies all the above functions to create a list of music. It makes
 the notes in the chord progression. For each call it passes the current chord to the next to ensure that
 rule of thumb 2 can be made. 
 
+pickTightest (pickClosest prev (applyPermutations createChord))
+pickTightest ((applyPermutations createChord))
+
 > createChords :: Key -> ChordProgression -> Triad -> [Music] 
 > createChords _ [] _ = []																
 > createChords rootKey ((note,dur):keys) previous = (mapChord (convertToNote current) dur) : createChords rootKey keys current
->    where current = makeTigther $ makeCloser previous $ createChord note $ findTriad rootKey note															
+>    where current = pickTightest $ pickClosest previous$  applyPermutations $ createChord note $ findTriad rootKey note															
 																					
 AutoChord creates the first chord of the song and then calls the createChords function to create the rest. 
 
 > autoChord :: Key -> ChordProgression -> Music
 > autoChord rootKey cp = Instr "piano" $ foldr1 (:+:) $ createChords rootKey cp headChord
->    where headChord = (makeTigther $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp))
+>    where headChord = pickTightest $ applyPermutations $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp)
 
 7.Automusic
 
