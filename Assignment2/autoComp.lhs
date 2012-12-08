@@ -16,7 +16,7 @@ and is used to describe songs in a program. Hiding key felt necessary because we
 > import Haskore hiding (Key)
 > import Ratio 
 > import Maybe
-
+> import Ix
 
 3.Types
 To make everything work definitions had to be made for the different musical terms.
@@ -238,6 +238,23 @@ the outcome is within this interval. All triad will be as low as possible this m
 
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
+
+
+> permutations = [[0,0,0],
+> 								[12,0,0],
+> 								[0,12,0],
+> 	 							[0,0,12],
+> 								[12,12,0],
+> 								[12,0,12],
+> 								[0,12,12],
+> 	 							[12,12,12]]
+
+> applyPermutations :: Triad -> [Triad]
+> applyPermutations triad = map (zipWith (+) triad) permutations
+
+> filterInRange :: [Triad] -> [Triad]
+> filterInRange = filter (all (inRange (52,67)))
+
 
 To handle the second rule of thumb we have a function which takes the previous Triad, the Current and returns
 a triad where each note is as close to the previous chord as possible. We make a recursive call for each note. For each note 
