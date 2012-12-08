@@ -194,7 +194,7 @@ AutoBass uses these helper functions recursively to generate a Music object of t
 >	where 
 >	generateBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
 
-6.Chords
+6. Chords
 We define a chord as a triad and a duration. We work with chords as ints and only when creating
 the chord with the duration we map it back to the PitchClass and a Octave. As of this
 we will only pass triads to the functions. 
@@ -240,7 +240,9 @@ the outcome is within this interval. All triad will be as low as possible this m
 > createChord :: PitchClass -> Triad -> Triad		
 > createChord n triad = map (findPitchInt noteList) $ map (findPitch notes) $ map ((findPitchInt notes n) + ) triad
 
-The second rule of thumb 
+We want the chords to change as little as possible from the previous one. This is done on a one note basis. To accomplish this we generate
+all possible permutations for the chord, we then ensure that we still follow rule 1. Finally we select the chords which are the closest to 
+our previous chord. 
 
 > permutations = [[0,0,0],
 > 								[12,0,0],
@@ -265,21 +267,21 @@ The second rule of thumb
 > closeSum :: Triad -> Triad -> Int
 > closeSum x y = abs $ sum $ zipWith (-) x y 
 
+As it happens several chords can be obtain that are close to the previous one. We want to select the chords that have the smallest
+inner difference. That is we want to select the chord as rule 3 describe. There can still be several chords that are tight, and if this
+happens we just selects the first.
+
 > pickTightest :: [Triad] -> Triad
 > pickTightest triads = head $ filter (\x -> tightSum x <= (getMinimum triads tightSum)) triads
 
 > tightSum :: Triad -> Int
 > tightSum triad = (maximum triad) - (minimum triad)
 
-ConvertToNote takes our triad and converts it to the proper notes to be played in the appropriate octave.
-As we represented all notes as ints we can use a simple division to get the correct octave.
+Since all chords has been represented as triads we need to map them back to chords so Haskore can play them properly.
 																					
 > convertToNote :: Triad -> NoteList
 > convertToNote [] = []
 > convertToNote (x:xs) = (fromJust $ lookupNote noteList x, div x 12):convertToNote xs
-
-This function maps our Notes and the duration to a music. It creates a chord where the notes
-in the note list is played simultaneous. 
 
 > mapChord :: NoteList -> Dur -> Music
 > mapChord chord dur = foldr1 (:=:) [ Note x dur [Volume 60] | x <- chord ]
@@ -287,9 +289,6 @@ in the note list is played simultaneous.
 CreateChords applies all the above functions to create a list of music. It makes an recursive call for each of 
 the notes in the chord progression. For each call it passes the current chord to the next to ensure that
 rule of thumb 2 can be made. 
-
-pickTightest (pickClosest prev (applyPermutations createChord))
-pickTightest ((applyPermutations createChord))
 
 > createChords :: Key -> ChordProgression -> Triad -> [Music] 
 > createChords _ [] _ = []																
@@ -302,7 +301,7 @@ AutoChord creates the first chord of the song and then calls the createChords fu
 > autoChord rootKey cp = Instr "piano" $ foldr1 (:+:) $ createChords rootKey cp headChord
 >    where headChord = pickTightest $ applyPermutations $ createChord (fst $head cp) $ findTriad rootKey (fst $ head cp)
 
-7.Automusic
+7. Automusic
 
 autoComp is the main function of this program and combines autoChord and autoBass. This function generates a accompaniment including a specified 
 bass line and the "correct" chords for the song given which BassStyle you want to use, the pitch and duration for 
