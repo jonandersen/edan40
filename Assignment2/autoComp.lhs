@@ -191,8 +191,9 @@ bass line given the BassStyle, the Kay and ChordProgression.
 > autoBass :: BassStyle -> Key -> ChordProgression -> Music
 > autoBass [] _ _ = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
 > autoBass _ _ [] = foldr1 (:=:) [Note (C,4) 0 [Volume 0]]
-> autoBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
-
+> autoBass bl k cl = generateBass bl k (splitChord bl cl)
+>	where 
+>	generateBass (b:bl) k (c:cl) = foldr1 (:=:) (handleRest c b (getScale k c)) :+: autoBass bl k cl
 
 6.Chords
 We define a chord as a triad and a duration. We work with chords as ints and only when creating
@@ -328,7 +329,6 @@ bass line and the "correct" chords for the song given which BassStyle you want t
 the different chords that are to be used and the key of the song. 
 
 > autoComp :: BassStyle -> ChordProgression -> Key -> Music
-> autoComp bs cp key =  (autoChord key cp) :=: (autoBass bs key $ splitChord bs cp)
-
+> autoComp bs cp key =  (autoChord key cp) :=: (autoBass bs key cp)
 
 
