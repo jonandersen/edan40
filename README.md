@@ -1,9 +1,7 @@
 edan40
 ========
 
-Chatterbots
-
-This is an Haskell application named Eliza.
-
+This project is about assignments and exams in the course EDAN40 done in 2012 
+by students Jon Andersen and Marcus Carlberg.
 
 ========
