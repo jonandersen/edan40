@@ -60,6 +60,16 @@ Hade inte klasser funnits i haskell hade man själv behövt definiera vad som me
 6
 \\\\\\\\\\\TODO\\\\\\\\\\\\\
 c a = (a\\) . (a\\)
+
+
+
 (\\) = foldl (flip delete)
-delete x [] = []
-delete x (y:ys) = if x==y then ys else y:delete x ys
+
+delete deletes the first occurrence of x.  
+
+> delete x [] = []
+> delete x (y:ys) = if x==y then ys else y:delete x ys
+> c1 a = (a (foldl (flip delete)))
+
+
+
