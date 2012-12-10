@@ -12,6 +12,13 @@
 Zip tar in 2 listor och kombinerar dem til en lista av tuplar där index 0 av lista a matchas med index 0 av lista b.
 unZip tar in en lista av tuplar och separerar dem till två listor.
 
+Both zip and unzip works on (or with) tuples. 
+Zip creates a list of tuples where each tuple consist of two elements from two lists. The two elements match 
+on index. 
+Unzip creates a tuple of two lists from a tuple list. The first tuple element is a list of elements
+all taken from the first tuple element in the tuple list. The second tuple element is taken from the second tuple element in the tuple list. 
+
+
 3
 ///////PATTERN MATCHING//////////
 
