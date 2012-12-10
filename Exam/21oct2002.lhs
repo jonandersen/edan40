@@ -32,8 +32,21 @@ all taken from the first tuple element in the tuple list. The second tuple eleme
 4
 //////////DO NOTATION///////////
 
+extract from implementation of list monad
+xs >>= f = concat (map f xs)
+
+> m = "123" >>= (\x -> (x:"lambda"))
+
+or 
+
+> m1 = [1,2,3] >>= (\_ -> ("lambda"))
+
+It's a list monad. 
+
 > g :: [Char]
-> g = do [1,2,3]; "lambda"
+> g = do 
+> 	x <- [1,2,3]
+> 	"lambda"
 
 do tar in en lista med längden 3 och kommer därför att göra det som står efter ; 3 gånger och därmed returnera "lambdalambdalambda"
 
