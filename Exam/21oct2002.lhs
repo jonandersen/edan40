@@ -1,11 +1,11 @@
 1
 /////LISTCOMPREHENSION
 
-> c :: a -> [a -> b] -> [b]
-> c x = map ($x
+> c :: a -> [(a -> b)] -> [b]
+> c x = map ($x)
 
-> cListComp :: a -> [a -> b] -> [b]
-> cListComp x ys = [y x | y <- ys]
+> cListComp :: a -> [(a -> b)] -> [b]
+> cListComp x fs = [f x | f <- fs]
 
 2
 ///////ZIP/////////
