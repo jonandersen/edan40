@@ -52,7 +52,7 @@ do tar in en lista med längden 3 och kommer därför att göra det som står ef
 
 5
 //////////CLASSES
-I haskell representerar klasser functioner som går att göra på en viss data structur. Använder en datastruktur sig av en klass Eq så kan man jämföra element i data strukturen om de är lika eller ej.
+I haskell representerar klasser funktioner som går att göra på en viss data struktur. Använder en datastruktur sig av en klass Eq så kan man jämföra element i data strukturen om de är lika eller ej.
 
 Hade inte klasser funnits i haskell hade man själv behövt definiera vad som menas med att tex visa, jämföra läsa och vad en Integral är för något. 
 
