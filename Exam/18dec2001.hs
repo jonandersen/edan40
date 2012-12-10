@@ -13,3 +13,18 @@ e = do
   return 4 -- e = 4
   return (7*x) -- e = 7 * 7 = 49
 
+-- 4 
+
+-- 5 
+-- Currying is the process of transforming a function that takes several arguments 
+-- into a function that takes only a single argument. With this we can partially apply
+-- function which is used in infix operators. Also it becomes easier to prove your functions.
+
+f :: a -> b -> c  -- uncurried
+g :: (a,b) -> c -- curried
+
+f = curry g
+g = uncurry f
+
+
+-- 6
