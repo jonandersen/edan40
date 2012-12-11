@@ -20,11 +20,16 @@ e = do
 -- into a function that takes only a single argument. With this we can partially apply
 -- function which is used in infix operators. Also it becomes easier to prove your functions.
 
-f :: a -> b -> c  -- uncurried
-g :: (a,b) -> c -- curried
+f :: a -> b -> c  -- curried
+g :: (a,b) -> c -- uncurried
 
 f = curry g
 g = uncurry f
 
 
 -- 6
+
+a = (foldr (-) 0 ). (map (+1))
+b = foldr ((-).(+1)) 0
+
+-- That is h = f.g and b =a

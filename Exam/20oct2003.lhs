@@ -62,9 +62,12 @@ foldr has switched arguments with foldl.
 We can use applicative functors. This is not included in the version we currently run.
 This is how it would be done.
 
->> pure (+) <*> x <*> y
->> pure (+) <*> x <*> z
->> pure (+) <*> (pure (\x -> (x+x)) <*> x) <*> (pure (\x -> (x+x)) <*> y)
+pure (+) <*> x <*> y
+pure (+) <*> x <*> z
+pure (+) <*> (pure (\x -> (x+x)) <*> x) <*> (pure (\x -> (x+x)) <*> y)
+
+
+
 
 
 
