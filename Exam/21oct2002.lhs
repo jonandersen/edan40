@@ -2,7 +2,7 @@
 /////LISTCOMPREHENSION
 
 > c :: a -> [a -> b] -> [b]
-> c x = map ($x
+> c x = map ($x)
 
 > cListComp :: a -> [a -> b] -> [b]
 > cListComp x ys = [y x | y <- ys]
