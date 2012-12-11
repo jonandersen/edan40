@@ -1,3 +1,5 @@
+> import Maybe
+
 1
 
 > applyPlusOne :: (Num b) => (a -> b) -> a -> b
@@ -51,6 +53,21 @@ foldr has switched arguments with foldl.
 > swap (a, b) =  (b, a)
 
 6.
+
+> x = Just 5
+> y = Just 3
+> z = Nothing
+
+
+We can use applicative functors. This is not included in the version we currently run.
+This is how it would be done.
+
+>> pure (+) <*> x <*> y
+>> pure (+) <*> x <*> z
+>> pure (+) <*> (pure (\x -> (x+x)) <*> x) <*> (pure (\x -> (x+x)) <*> y)
+
+
+
 För att hantera additioner av typen Just måste man först konvertera x och y
 fron typen maybe till en typ som det går att utföra aritmetiska utryck på.
 Detta gör man med functionen fromJust. Därefter kan man utföra additionen och
