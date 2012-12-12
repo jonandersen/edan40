@@ -1,8 +1,9 @@
 1.
 
-z xs x= filter . flip elem xs x
+> f :: (Eq a) => [a] -> [a] -> [a]
+> f = filter . flip elem
 
-> g p xs = [x | x <- xs, x == p]
+> g ys xs = [x | x <- xs , elem x ys]
 
 2.
 Currying is the process of transforming a function that takes several arguments 
