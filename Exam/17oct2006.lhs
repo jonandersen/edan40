@@ -10,6 +10,7 @@ This is evaluted as ((\x -> filter (flip elem x))y)
 
 > f1 :: (Eq a) => [a] -> [a] -> [a]
 > f1 xs ys = [x | x <- xs, elem x ys]
+> g ys xs = [x | x <- xs , elem x ys]
 
 2.
 Currying is the process of transforming a function that takes several arguments 
