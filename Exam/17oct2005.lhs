@@ -11,6 +11,10 @@ Lazy evaluation means that the value is not calculated until it is actually need
 
 3. 
 
+> g :: (a->a) -> a -> Maybe (a,a)
+> g f x = Just (x, f x)
+> iterate1 :: (a->a) -> a -> [a]
+> iterate1 = unfoldr . g
 
 
 
