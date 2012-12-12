@@ -6,7 +6,7 @@
 > mapper = map (const (++)) 
 
 2.
-Lazy evaluation means that the value is not calculated until it is actually needed.
+Lazy evaluation means that the value is not calculated until it is actually needed. This means that haskell can handle infinite data structures.
 
 
 3. 
@@ -16,5 +16,20 @@ Lazy evaluation means that the value is not calculated until it is actually need
 > iterate1 :: (a->a) -> a -> [a]
 > iterate1 = unfoldr . g
 
+4.
 
 
+5.
+
+
+
+6a. 
+q :: (Eq a) => [a] -> [a]
+
+> q [] = []
+> q (x:xs) = x : q (filter (/=x) xs)
+
+> l = foldr f z
+> f x = nub x
+> z = []
+> test x = nub x
