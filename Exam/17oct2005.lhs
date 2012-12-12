@@ -18,3 +18,19 @@ Lazy evaluation means that the value is not calculated until it is actually need
 
 
 
+4.
+
+5.
+
+> fmapper f m = do
+>   x <- m
+>   return (f x)
+
+6.
+
+> q :: (Eq a) => [a] -> [a]
+> q [] = []
+> q (x:xs) = x : q (filter (/=x) xs)
+
+This function removes duplicates in the list.
+
