@@ -6,7 +6,7 @@
 > mapper = map (const (++)) 
 
 2.
-Lazy evaluation means that the value is not calculated until it is actually needed.
+Lazy evaluation means that the value is not calculated until it is actually needed. This means that haskell can handle infinite data structures.
 
 
 3. 
@@ -16,21 +16,31 @@ Lazy evaluation means that the value is not calculated until it is actually need
 > iterate1 :: (a->a) -> a -> [a]
 > iterate1 = unfoldr . g
 
-
-
-4.
-
 5.
 
 > fmapper f m = do
 >   x <- m
 >   return (f x)
 
-6.
 
-> q :: (Eq a) => [a] -> [a]
+
+
+
+6a. 
+This function removes duplicates in the list.
+q :: (Eq a) => [a] -> [a]
+
 > q [] = []
 > q (x:xs) = x : q (filter (/=x) xs)
 
-This function removes duplicates in the list.
+6.
+using nub, doesn't seem to be 'the way'.
+
+> l :: (Eq a) => [a] -> [a]
+> l = foldr f []
+
+> f :: (Eq a) => a -> [a] -> [a]
+> f x xs
+>   | elem x xs = xs
+>   | otherwise = x:xs
 
