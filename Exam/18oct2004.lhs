@@ -67,6 +67,20 @@ Or a as a Monad
 > 	Just (a,b) -> a : unfoldr f b
 
 
+> fibonacci = unfoldr (\[a,b] -> Just(a+b,[b,b+a])) [0,1]
+
+:t unfoldr :: (b -> Maybe (a, b)) -> b -> [a]
+:t foldr :: (a -> b -> b) -> b -> [a] -> b
+
+> a xs z = unfoldr f' (foldr f z xs)
+
+If the following holds:
+
+f' (f x y) = Just (x,y)
+f' z       = Nothing
+
+
+
 
 
 
