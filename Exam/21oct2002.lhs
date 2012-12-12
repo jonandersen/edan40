@@ -48,13 +48,17 @@ It's a list monad.
 > 	x <- [1,2,3]
 > 	"lambda"
 
-do tar in en lista med längden 3 och kommer därför att göra det som står efter ; 3 gånger och därmed returnera "lambdalambdalambda"
+do tar in en lista med längden 3 och kommer därför att göra det som står efter 
+; 3 gånger och därmed returnera "lambdalambdalambda"
 
 5
 //////////CLASSES
-I haskell representerar klasser funktioner som går att göra på en viss data struktur. Använder en datastruktur sig av en klass Eq så kan man jämföra element i data strukturen om de är lika eller ej.
+I haskell representerar klasser funktioner som går att göra på en viss data 
+struktur. Använder en datastruktur sig av en klass Eq så kan man jämföra element
+ i data strukturen om de är lika eller ej.
 
-Hade inte klasser funnits i haskell hade man själv behövt definiera vad som menas med att tex visa, jämföra läsa och vad en Integral är för något. 
+Hade inte klasser funnits i haskell hade man själv behövt definiera vad som
+menas med att tex visa, jämföra läsa och vad en Integral är för något. 
 
 
 6
