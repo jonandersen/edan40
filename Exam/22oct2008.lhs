@@ -1,3 +1,5 @@
+> import List
+
 1.
 
 > a = map (:)
@@ -27,6 +29,13 @@ programs work is intended.
 
 5.
 
+> g :: (Eq a) => [a] -> [[a]]
+> g [] = [[]]
+> g xs = concat [ map (x:) (g (xs \\ [x])) | x <- xs]
 
+This function creatse all permutations of the list elements. 
+The empty list is needed as we make a recursive call and we need an stop case.
 
 6.
+
+> fil p = foldr (\x xs -> if p x then (x:xs) else xs) []
