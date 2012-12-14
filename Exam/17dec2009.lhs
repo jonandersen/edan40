@@ -20,6 +20,12 @@ The major advantage is that you can construct formal proof for your functions
 
 5. 
 
+zipwith map takes 2 lists a and b and maps whats in a with whats in b
+
+map zipwith applies zipwoth on every element of a list
+
+map . zipwith maps the result of zipwith f x y with a list z.
+
 6.
 One folds from right and one from left.
 
