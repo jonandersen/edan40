@@ -1,16 +1,20 @@
 1a.
 
-> f = (+) 5 . (/) 8
+> f = (5+) . (8/)
 
-> g = flip ((+) . (*) 3)
+> g = flip ((+) . (3*))
+
+
 
 2.
 
-> f2 xs = map (f. (+4)) $ filter (>5) xs
+> f2 f xs = map (f. (+4)) $ filter (>5) xs
+
 
 3.
 
 data digits doesn't derive Enum which is required
+
 
 4.
 
